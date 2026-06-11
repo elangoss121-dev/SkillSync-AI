@@ -8,7 +8,7 @@ export function AppProvider({ children }) {
     return localStorage.getItem('skillsync_api_key') || ''
   })
   const [backendUrl, setBackendUrl] = useState(() => {
-    return localStorage.getItem('skillsync_backend_url') || 'http://localhost:8000'
+    return localStorage.getItem('skillsync_backend_url') || import.meta.env.VITE_API_URL || ''
   })
   const [toasts, setToasts] = useState([])
 

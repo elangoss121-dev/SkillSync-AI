@@ -4,7 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Eye, EyeOff, Mail, Lock, User, Zap, ArrowRight, Check, Sparkles } from 'lucide-react'
 import axios from 'axios'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+// Relative URL in production = same Vercel domain handles /api/* via serverless
+// For local dev: create frontend/.env.local with VITE_API_URL=http://localhost:8000
+const API_BASE = import.meta.env.VITE_API_URL || ''
 
 // Password strength checker
 function getPasswordStrength(password) {
