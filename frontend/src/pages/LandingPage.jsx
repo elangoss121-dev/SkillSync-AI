@@ -5,7 +5,6 @@ import {
   Terminal as TerminalIcon, FileText, Code2, Layout, ArrowRight,
   Sparkles, CheckCircle2, ChevronRight, Play, Cpu, Server, Activity
 } from 'lucide-react'
-import ThemeToggle from '../components/ui/ThemeToggle'
 import { useApp } from '../context/AppContext'
 
 // 4 Simulator States for the Interactive Terminal Preview
@@ -141,7 +140,6 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <ThemeToggle />
             <button
               onClick={() => navigate('/login')}
               className="px-4 py-1.5 text-xs border rounded transition-colors font-semibold hover:bg-[color:var(--bg-hover)] cursor-pointer"

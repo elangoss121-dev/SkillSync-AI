@@ -26,60 +26,17 @@ export function AppProvider({ children }) {
     window.location.href = '/login'
   }, [])
 
-  // Theme: checks localStorage first, then system preference
-  const [theme, setTheme] = useState(() => {
-    try {
-      const localTheme = localStorage.getItem('skillsync_theme')
-      if (localTheme === 'dark' || localTheme === 'light') return localTheme
-    } catch { /* ignore */ }
-
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    }
-    return 'dark' // Default fallback
-  })
+  // Theme: locked to 'dark'
+  const theme = 'dark'
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => {
-      const next = prev === 'dark' ? 'light' : 'dark'
-      try {
-        localStorage.setItem('skillsync_theme', next)
-      } catch { /* ignore */ }
-      return next
-    })
+    // No-op since light mode is removed
   }, [])
 
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    
-    const handleChange = (e) => {
-      // Only follow system changes if user hasn't explicitly set a preference
-      try {
-        if (!localStorage.getItem('skillsync_theme')) {
-          setTheme(e.matches ? 'dark' : 'light')
-        }
-      } catch {
-        setTheme(e.matches ? 'dark' : 'light')
-      }
-    }
-
-    mediaQuery.addEventListener('change', handleChange)
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange)
-    }
-  }, [])
-
-  // Apply 'dark' class on <html> whenever theme changes
   useEffect(() => {
     const root = document.documentElement
-    if (theme === 'dark') {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
-  }, [theme])
+    root.classList.add('dark')
+  }, [])
 
   const addToast = useCallback((message, type = 'info', duration = 4000) => {
     const id = Date.now() + Math.random()

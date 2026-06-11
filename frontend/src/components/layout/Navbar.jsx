@@ -1,7 +1,6 @@
 import { useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { Folder, ChevronRight, User, Menu, BarChart2, Search } from 'lucide-react'
-import ThemeToggle from '../ui/ThemeToggle'
 
 const BREADCRUMBS = {
   '/dashboard/error-explainer': ['src', 'pages', 'ErrorExplainer.jsx'],
@@ -103,9 +102,6 @@ export default function Navbar({ onMenuClick, onInsightsToggle, onSearchClick })
           <BarChart2 className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Insights</span>
         </button>
-
-        {/* Theme toggle */}
-        <ThemeToggle />
 
         {/* Profile / Avatar */}
         {user ? (

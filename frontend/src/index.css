@@ -9,8 +9,8 @@
    Dark is default (Matte Black & Graphite); light is fallback
    ───────────────────────────────────────────────────────────── */
 
-/* DARK THEME (default) */
-.dark, :root {
+/* DESIGN TOKENS — CSS Custom Properties */
+:root {
   --bg-base:          #0A0A0A; /* Matte Black */
   --bg-surface:       #151515; /* Subtle Graphite */
   --bg-elevated:      #202020; /* Elevated Graphite */
@@ -51,50 +51,6 @@
 
   /* Shadows */
   --card-shadow: none;
-}
-
-/* LIGHT THEME */
-:root:not(.dark) {
-  --bg-base:          #F8FAFC; /* Slate background */
-  --bg-surface:       #FFFFFF; /* White card */
-  --bg-elevated:      #F1F5F9;
-  --bg-hover:         rgba(99, 102, 241, 0.05);
-  --border:           #E2E8F0;
-  --border-solid:     #CBD5E1;
-  --text-primary:     #0F172A;
-  --text-secondary:   #64748B;
-  --text-muted:       #94A3B8;
-  --text-placeholder: #94A3B8;
-  --input-bg:         #FFFFFF;
-  --input-border:     #E2E8F0;
-  --scrollbar-track:  #F8FAFC;
-  --scrollbar-thumb:  rgba(99, 102, 241, 0.15);
-  --grid-color:       rgba(99, 102, 241, 0.015); /* Indigo grid */
-  --terminal-bg:      #FFFFFF;
-  --terminal-header:  #F8FAFC;
-  --glass-bg:         rgba(255, 255, 255, 0.85);
-  --glass-hover-bg:   rgba(255, 255, 255, 0.98);
-  --skeleton-from:    #E2E8F0;
-  --skeleton-to:      #F1F5F9;
-  
-  --accent-primary:   #6366F1; /* Indigo */
-  --accent-purple:    #8B5CF6; /* Purple */
-  --accent-cyan:      #06B6D4;
-  --accent-primary-glow: rgba(99, 102, 241, 0.1);
-  --accent-gradient:  linear-gradient(90deg, #6366F1 0%, #8B5CF6 100%);
-
-  /* Sidebar active navigation variables */
-  --sidebar-active-bg: rgba(99, 102, 241, 0.08);
-  --sidebar-active-border: #6366F1;
-  --sidebar-active-text: #6366F1;
-  --sidebar-active-icon: #6366F1;
-
-  /* Theme Toggle active pill */
-  --theme-toggle-pill: #6366F1;
-  --theme-toggle-active-text: #FFFFFF;
-
-  /* Shadows - soft clean shadow in light mode */
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 16px -4px rgba(99, 102, 241, 0.03);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -267,23 +223,11 @@
     height: 52px; /* 52px Button height */
   }
 
-  :root:not(.dark) .btn-primary {
-    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
-    color: #FFFFFF;
-    border: none;
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.18);
-  }
-
   .btn-primary:hover {
     background: #FF804F;
     border-color: #FF804F;
     transform: translateY(-2px); /* Card lift */
     box-shadow: 0 4px 16px var(--accent-primary-glow);
-  }
-
-  :root:not(.dark) .btn-primary:hover {
-    background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.28);
   }
 
   .btn-primary:active {
@@ -556,7 +500,4 @@
   mix-blend-mode: screen;
   animation: pulseGlow 6s ease-in-out infinite;
 }
-:root:not(.dark) .glow-orb {
-  mix-blend-mode: multiply;
-  opacity: 0.08;
-}
+
