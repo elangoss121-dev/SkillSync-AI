@@ -2,6 +2,7 @@ import { useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { motion } from 'framer-motion'
 import { User } from 'lucide-react'
+import ThemeToggle from '../ui/ThemeToggle'
 
 const PAGE_NAMES = {
   '/dashboard/error-explainer': 'AI Error Explainer',
@@ -31,6 +32,9 @@ export default function Navbar() {
       </motion.h1>
 
       <div className="flex items-center gap-3">
+        {/* Theme toggle */}
+        <ThemeToggle />
+
         {/* Avatar */}
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center cursor-pointer hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-shadow">
           <User className="w-4 h-4 text-white" />

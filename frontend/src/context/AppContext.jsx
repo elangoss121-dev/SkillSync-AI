@@ -26,13 +26,28 @@ export function AppProvider({ children }) {
     window.location.href = '/login'
   }, [])
 
-  // Theme: automatic detection based on system preference
+  // Theme: checks localStorage first, then system preference
   const [theme, setTheme] = useState(() => {
+    try {
+      const localTheme = localStorage.getItem('skillsync_theme')
+      if (localTheme === 'dark' || localTheme === 'light') return localTheme
+    } catch { /* ignore */ }
+
     if (typeof window !== 'undefined' && window.matchMedia) {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
     }
     return 'dark' // Default fallback
   })
+
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark'
+      try {
+        localStorage.setItem('skillsync_theme', next)
+      } catch { /* ignore */ }
+      return next
+    })
+  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return
@@ -40,13 +55,16 @@ export function AppProvider({ children }) {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     
     const handleChange = (e) => {
-      setTheme(e.matches ? 'dark' : 'light')
+      // Only follow system changes if user hasn't explicitly set a preference
+      try {
+        if (!localStorage.getItem('skillsync_theme')) {
+          setTheme(e.matches ? 'dark' : 'light')
+        }
+      } catch {
+        setTheme(e.matches ? 'dark' : 'light')
+      }
     }
 
-    // Initialize theme
-    setTheme(mediaQuery.matches ? 'dark' : 'light')
-
-    // Listen for changes
     mediaQuery.addEventListener('change', handleChange)
     return () => {
       mediaQuery.removeEventListener('change', handleChange)
@@ -78,7 +96,7 @@ export function AppProvider({ children }) {
   return (
     <AppContext.Provider value={{
       toasts, addToast, removeToast,
-      theme,
+      theme, toggleTheme,
       user, login, logout,
     }}>
       {children}
