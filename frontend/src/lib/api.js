@@ -48,5 +48,11 @@ export const api = {
       headers: { 'Content-Type': 'multipart/form-data', ...headers },
     }),
 
+  quickChat: (payload, headers = {}) =>
+    createClient().post('/api/quick-chat', toForm(payload), {
+      headers: { 'Content-Type': 'multipart/form-data', ...headers },
+    }),
+
   health: () => createClient().get('/api/health'),
 }
+

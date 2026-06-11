@@ -7,15 +7,17 @@ import os
 # Add backend directory to Python path so imports work
 sys.path.insert(0, os.path.dirname(__file__))
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Form
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
+from typing import Optional
 
 load_dotenv()
 
 from routes import error_explainer, docs_generator, code_simplifier, ui_to_code, auth
 from utils.database import init_db
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -55,7 +57,42 @@ async def health():
     return {"status": "ok", "version": "1.0.0"}
 
 
+@app.post("/api/quick-chat")
+async def quick_chat(
+    request: Request,
+    message: str = Form(...),
+    history: Optional[str] = Form(None)
+):
+    api_key = request.headers.get("X-API-Key") or None
+    groq_api_key = request.headers.get("X-Groq-API-Key") or None
+    openrouter_api_key = request.headers.get("X-OpenRouter-API-Key") or None
+    preferred_provider = request.headers.get("X-Preferred-Provider") or "auto"
+    
+    prompt = f"""You are a helpful, enterprise-grade AI software development teammate built into the SkillSync AI Developer Operating System.
+Answer the user's technical questions accurately, concisely, and with premium developer insights. Use markdown formatting and code snippets where appropriate.
+
+Chat History:
+{history or "No previous messages."}
+
+User: {message}
+Assistant:"""
+
+    try:
+        from ai_providers import gemini_client
+        raw, model_used = await gemini_client.generate(
+            prompt,
+            api_key=api_key,
+            groq_api_key=groq_api_key,
+            openrouter_api_key=openrouter_api_key,
+            preferred_provider=preferred_provider,
+        )
+        return {"response": raw, "model": model_used}
+    except Exception as e:
+        return {"response": f"AI error occurred: {str(e)}", "model": "error"}
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
 

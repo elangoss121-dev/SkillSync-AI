@@ -1,257 +1,299 @@
-import { motion } from 'framer-motion'
+import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import {
-  Bug, FileText, Code2, Image, ArrowRight,
-  Zap, Star, ExternalLink, Sparkles,
-  ChevronRight, Play
+  Terminal as TerminalIcon, FileText, Code2, Layout, ArrowRight,
+  Sparkles, CheckCircle2, ChevronRight, Play, Cpu, Server, Activity
 } from 'lucide-react'
-import AnimatedCodeBg from '../components/ui/AnimatedCodeBg'
-import { useApp } from '../context/AppContext'
 import ThemeToggle from '../components/ui/ThemeToggle'
 
-const FEATURES = [
+// 4 Simulator States for the Interactive Terminal Preview
+const SIMULATIONS = [
   {
-    icon: Bug,
-    color: 'from-red-500 to-orange-500',
-    glow: 'rgba(239,68,68,0.15)',
-    title: 'AI Error Explainer',
-    desc: 'Upload screenshots or paste terminal logs. Get root cause analysis, beginner-friendly explanations, and corrected code instantly.',
-    tags: ['OCR Support', 'Code Fix', 'Severity Badge'],
+    id: 'error',
+    label: 'Error Explainer',
+    icon: TerminalIcon,
+    filename: 'ProductList.jsx — Diagnostic Core',
+    inputTitle: 'terminal.log',
+    inputCode: `TypeError: Cannot read properties of undefined (reading 'map')
+  at ProductList (ProductList.jsx:12:24)
+  at renderWithHooks (react-dom.js:154)
+  at mountIndeterminateComponent (react-dom.js:182)`,
+    outputTitle: 'skillsync-diagnostics.json',
+    outputCode: `{
+  "error": "TypeError: Cannot read map of undefined",
+  "root_cause": "Called .map() on 'data.items' which is undefined on initial mount.",
+  "confidence": "96%",
+  "proposed_fix": "const items = (data?.items ?? []).map(i => i.name);"
+}`
   },
   {
+    id: 'docs',
+    label: 'Docs Generator',
     icon: FileText,
-    color: 'from-blue-500 to-indigo-500',
-    glow: 'rgba(59,130,246,0.15)',
-    title: 'Docs Generator',
-    desc: 'Paste a GitHub URL or upload files. Generate README, API docs, setup guides, and architecture summaries automatically.',
-    tags: ['README', 'API Docs', 'Export'],
+    filename: 'docs_service.py — Documentation',
+    inputTitle: 'github-repo-payload',
+    inputCode: `// download_github_repo(owner="skillsync-ai", repo="core")
+// ZIP parsed successfully. 14 source files found.
+// Generating README.md...`,
+    outputTitle: 'README.md',
+    outputCode: `# SkillSync AI Core Service
+
+FastAPI service handling Gemini OCR models and file parsers.
+
+## API Setup
+\`\`\`bash
+pip install -r requirements.txt
+uvicorn main:app --reload
+\`\`\`
+
+## Key Modules
+- \`ai_providers/\`: Core LLM orchestration
+- \`services/\`: Analysis service layers`
   },
   {
+    id: 'simplify',
+    label: 'Code Simplifier',
     icon: Code2,
-    color: 'from-purple-500 to-pink-500',
-    glow: 'rgba(168,85,247,0.15)',
-    title: 'Code Simplifier',
-    desc: 'Paste complex algorithms and get line-by-line explanations, simplified versions, and optimization suggestions.',
-    tags: ['Monaco Editor', 'Complexity Score', 'Line Explanations'],
+    filename: 'utils.js — Refactor Engine',
+    inputTitle: 'complex_function.js',
+    inputCode: `function checkUsers(users) {
+  let active = [];
+  for (let i = 0; i < users.length; i++) {
+    if (users[i].active === true) {
+      if (users[i].role === "admin") {
+        active.push(users[i]);
+      }
+    }
+  }
+  return active;
+}`,
+    outputTitle: 'simplified_function.js',
+    outputCode: `// Complexity score reduced from 8 to 2
+function checkUsers(users) {
+  return users.filter(u => u.active && u.role === "admin");
+}`
   },
   {
-    icon: Image,
-    color: 'from-cyan-500 to-teal-500',
-    glow: 'rgba(34,211,238,0.15)',
-    title: 'UI to Code',
-    desc: 'Upload a wireframe or design screenshot. Get production-ready React + Tailwind components with live preview.',
-    tags: ['React Code', 'Tailwind', 'Live Preview'],
-  },
+    id: 'ui-to-code',
+    label: 'UI to Code',
+    icon: Layout,
+    filename: 'mockup_uploader.png — UI Compiler',
+    inputTitle: 'wireframe-mockup.png',
+    inputCode: `[Image Payload: 1200x800px]
+- Detected layout: Sidebar Navigation + Main Editor grid
+- Color theme: Dark mode (#0A0A0A background)
+- Extracting components...`,
+    outputTitle: 'DashboardPreview.jsx',
+    outputCode: `export default function Dashboard() {
+  return (
+    <div className="flex h-screen bg-[#0A0A0A] text-white">
+      <Sidebar className="w-64 border-r border-zinc-800" />
+      <main className="flex-1 p-6 bg-grid">
+        <h1 className="text-xl font-bold">Workspace</h1>
+      </main>
+    </div>
+  )
+}`
+  }
 ]
-
-const TESTIMONIALS = [
-  { name: 'Sarah Chen', role: 'Senior Engineer @ Stripe', text: 'SkillSync saved me 3 hours debugging a cryptic TypeScript error. The explanation was spot-on.', avatar: 'SC' },
-  { name: 'James Park', role: 'Fullstack Dev @ Vercel', text: "Generated docs for our entire API in 30 seconds. This is what AI tooling should feel like.", avatar: 'JP' },
-  { name: 'Priya Nair', role: 'CS Student', text: "The 'Explain Like Beginner' toggle in Code Simplifier changed how I understand algorithms.", avatar: 'PN' },
-]
-
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.12 } },
-}
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
-}
 
 export default function LandingPage() {
   const navigate = useNavigate()
-  const { theme } = useApp()
-  const isDark = theme === 'dark'
+  const [activeSimId, setActiveSimId] = useState('error')
+  const activeSim = SIMULATIONS.find(s => s.id === activeSimId)
+
+  // Auto-switch simulator tabs every 6 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSimId(prevId => {
+        const currIdx = SIMULATIONS.findIndex(s => s.id === prevId)
+        const nextIdx = (currIdx + 1) % SIMULATIONS.length
+        return SIMULATIONS[nextIdx].id
+      })
+    }, 6000)
+    return () => clearInterval(timer)
+  }, [])
 
   return (
     <div
-      className="min-h-screen overflow-x-hidden transition-colors duration-300 relative"
+      className="min-h-screen transition-colors duration-300 font-sans relative overflow-x-hidden"
       style={{ background: 'var(--bg-base)', color: 'var(--text-primary)' }}
     >
-      {/* ─── TOP NAV BAR (landing) ─── */}
-      <div className="fixed top-0 right-0 z-50 p-4">
-        <ThemeToggle />
-      </div>
+      {/* Grid background lines */}
+      <div className="absolute inset-0 bg-grid opacity-20 pointer-events-none" />
 
+      {/* Subtle single orange glow center top */}
+      <div 
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] rounded-full blur-[140px] pointer-events-none opacity-40" 
+        style={{ background: 'radial-gradient(circle, rgba(255, 107, 53, 0.15) 0%, transparent 80%)' }}
+      />
 
-      {/* ─── HERO ─── */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
-        {/* Background effects */}
-        <div className="absolute inset-0 bg-grid opacity-35" />
-        
-        {/* Ambient background glows */}
-        <div className="glow-orb bg-indigo-600/15 w-[500px] h-[500px] top-[-10%] left-[-10%]" />
-        <div className="glow-orb bg-purple-600/15 w-[600px] h-[600px] bottom-[10%] right-[-10%]" />
-        <div className="glow-orb bg-cyan-500/10 w-[400px] h-[400px] top-[40%] left-[30%]" />
-        
-        <AnimatedCodeBg />
+      {/* HEADER NAVBAR */}
+      <header className="sticky top-0 z-40 w-full border-b backdrop-blur-md" style={{ borderColor: 'var(--border)', backgroundColor: 'rgba(10,10,10,0.7)' }}>
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between font-mono">
+          <div className="flex items-center gap-2 select-none cursor-pointer" onClick={() => navigate('/')}>
+            <Cpu className="w-4 h-4 text-[#FF6B35]" />
+            <span className="text-sm font-bold text-[#FF6B35]">skillsync.ai</span>
+          </div>
 
-        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <button
+              onClick={() => navigate('/login')}
+              className="px-4 py-1.5 text-xs border rounded transition-colors hover:border-[#FF6B35] font-semibold text-zinc-300 hover:text-white"
+              style={{ borderColor: 'var(--border-solid)', backgroundColor: 'var(--bg-surface)' }}
+            >
+              Sign In
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* HERO SECTION */}
+      <section className="relative pt-20 pb-16 px-6">
+        <div className="max-w-5xl mx-auto text-center">
           {/* Badge */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 text-xs font-semibold mb-8"
+            className="inline-flex items-center gap-2 px-3.5 py-1 text-[11px] font-mono border rounded bg-[#151515] text-[#FF6B35] mb-6"
+            style={{ borderColor: 'rgba(255, 107, 53, 0.2)' }}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            Powered by Gemini AI · Demo-ready
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            OPERATIONAL STABILITY: OPTIMAL (GEMINI 2.5 FLASH)
           </motion.div>
 
-          {/* Headline */}
+          {/* Large Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight text-balance mb-8"
-            style={{ color: 'var(--text-primary)' }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-4xl md:text-6xl font-bold tracking-tight text-[#F8F8F8] leading-[1.15] max-w-4xl mx-auto mb-6"
           >
-            Your AI Teammate for{' '}
-            <span className="gradient-text font-black">Debugging, Docs</span>
-            <br />& Code Understanding
+            Your AI Teammate for Debugging, Documentation & Code Understanding
           </motion.h1>
 
-          {/* Subheading */}
+          {/* Subtitle */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.25 }}
-            className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-12 text-balance leading-relaxed"
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-zinc-400 text-sm md:text-base max-w-2xl mx-auto mb-10 leading-relaxed"
           >
-            SkillSync AI understands your errors, writes your docs, explains complex code,
-            and converts UI mockups into production-ready React — all in seconds.
+            An enterprise-grade Developer OS environment engineered to explain compile diagnostics, auto-document complex codebases, refactor scripts, and build functional React from images.
           </motion.p>
 
-          {/* CTA Buttons */}
+          {/* Action Callouts */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-wrap items-center justify-center gap-4"
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex flex-wrap items-center justify-center gap-4 mb-16"
           >
             <button
-              id="hero-get-started"
               onClick={() => navigate('/dashboard/error-explainer')}
-              className="btn-primary text-base px-8 py-3.5 shadow-xl hover:shadow-indigo-500/30"
+              className="btn-primary"
             >
-              Get Started Free
+              Open Developer OS
               <ArrowRight className="w-4 h-4" />
             </button>
             <button
-              id="hero-watch-demo"
-              onClick={() => navigate('/dashboard/error-explainer')}
-              className="btn-secondary text-base px-8 py-3.5"
+              onClick={() => {
+                // Navigate to same dashboard
+                navigate('/dashboard/error-explainer')
+              }}
+              className="btn-secondary"
             >
-              <Play className="w-4 h-4 fill-current text-indigo-500" />
-              Watch Demo
+              <Play className="w-3.5 h-3.5 text-[#FF6B35]" />
+              Quick Demo
             </button>
-          </motion.div>
-
-          {/* Social proof */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="flex items-center justify-center gap-6 mt-16 text-zinc-500 text-sm font-semibold"
-          >
-            <span className="flex items-center gap-1.5">
-              <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-              4.9 rating
-            </span>
-            <span>·</span>
-            <span>2,400+ developers</span>
-            <span>·</span>
-            <span className="flex items-center gap-1.5">
-              <ExternalLink className="w-4 h-4 text-zinc-500" />
-              Open Source
-            </span>
           </motion.div>
         </div>
 
-        {/* Scroll indicator */}
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-zinc-600"
-        >
-          <div className="w-px h-8 bg-gradient-to-b from-transparent to-zinc-600" />
-          <span className="text-[10px] uppercase tracking-widest font-bold">Scroll</span>
-        </motion.div>
-      </section>
-
-      {/* ─── DEMO PREVIEW ─── */}
-      <section className="px-4 pb-20 relative">
-        <div className="glow-orb bg-indigo-600/10 w-[500px] h-[500px] top-[10%] left-[25%] -translate-x-1/2" />
-        
-        <div className="max-w-5xl mx-auto relative z-10">
+        {/* INTERACTIVE TERMINAL PREVIEW */}
+        <div className="max-w-4xl mx-auto px-2">
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="rounded-2xl overflow-hidden shadow-2xl border"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="rounded-lg border overflow-hidden shadow-2xl bg-[#0A0A0A]"
             style={{ borderColor: 'var(--border-solid)' }}
           >
-            {/* Terminal mockup */}
-            <div className="terminal-card rounded-none border-0">
-              <div className="terminal-header flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <div className="terminal-dot bg-red-500/80" />
-                  <div className="terminal-dot bg-yellow-500/80" />
-                  <div className="terminal-dot bg-green-500/80" />
-                  <span className="ml-3 text-xs text-zinc-400 font-mono flex items-center gap-1.5 bg-zinc-900/60 px-3 py-1 rounded-md border border-zinc-850">
-                    <Bug className="w-3.5 h-3.5 text-indigo-400" />
-                    ProductList.jsx — Error Explainer
-                  </span>
+            {/* Terminal Top Control Bar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 py-2.5 border-b bg-[#151515] font-mono text-xs gap-3" style={{ borderColor: 'var(--border)' }}>
+              {/* Fake control lights and Active file indicator */}
+              <div className="flex items-center gap-3">
+                <div className="flex gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-500/80"></span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider mr-2">Connected</span>
+                <span className="text-zinc-500">/</span>
+                <span className="text-zinc-300 font-semibold flex items-center gap-1.5 bg-[#0A0A0A] border px-2.5 py-0.5 rounded" style={{ borderColor: 'var(--border)' }}>
+                  <TerminalIcon className="w-3.5 h-3.5 text-[#FF6B35]" />
+                  {activeSim.filename}
+                </span>
+              </div>
+
+              {/* Status display */}
+              <div className="flex items-center gap-3 text-[10px] text-zinc-500">
+                <span className="flex items-center gap-1">
+                  <Server className="w-3.5 h-3.5 text-[#FF6B35]" />
+                  Core: 104-api
+                </span>
+                <span className="flex items-center gap-1">
+                  <Activity className="w-3.5 h-3.5 text-emerald-500" />
+                  96% Confidence
+                </span>
+              </div>
+            </div>
+
+            {/* Selector tabs bar */}
+            <div className="flex border-b font-mono text-[11px]" style={{ borderColor: 'var(--border)', backgroundColor: '#101010' }}>
+              {SIMULATIONS.map(s => {
+                const Icon = s.icon
+                const isActive = activeSimId === s.id
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => setActiveSimId(s.id)}
+                    className={`flex items-center gap-2 px-4 py-2 border-r focus:outline-none transition-colors ${
+                      isActive ? 'bg-[#0A0A0A] text-[#FF6B35] font-bold' : 'text-zinc-500 hover:text-zinc-300 hover:bg-[#151515]'
+                    }`}
+                    style={{ 
+                      borderColor: 'var(--border)',
+                      borderTop: isActive ? '2px solid #FF6B35' : 'none'
+                    }}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {s.label}
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Terminal screen */}
+            <div className="p-6 grid md:grid-cols-2 gap-6 font-mono text-xs bg-[#0A0A0A] min-h-[260px] select-none">
+              {/* Left pane: input simulation */}
+              <div className="flex flex-col space-y-2">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">{activeSim.inputTitle}</span>
+                <div 
+                  className="flex-1 p-4 rounded border text-zinc-300 overflow-x-auto whitespace-pre leading-relaxed bg-[#0C0C0C]" 
+                  style={{ borderColor: 'var(--border)' }}
+                >
+                  {activeSim.inputCode}
                 </div>
               </div>
-              <div className="p-6 grid md:grid-cols-2 gap-6 bg-zinc-950/80">
-                {/* Input side */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-zinc-400 font-mono font-semibold">error.log</span>
-                  </div>
-                  <div className="bg-zinc-905/90 rounded-xl p-5 text-xs font-mono space-y-1.5 border border-zinc-800 shadow-inner min-h-[160px]">
-                    <p className="text-red-450 font-bold">TypeError: Cannot read properties of</p>
-                    <p className="text-red-455 font-bold">  undefined (reading 'map')</p>
-                    <p className="text-zinc-500">    at ProductList (ProductList.jsx:12)</p>
-                    <p className="text-zinc-500">    at renderWithHooks (react-dom.js)</p>
-                    <p className="text-zinc-600 mt-4">// user's code</p>
-                    <p className="text-zinc-300">
-                      const items = <span className="text-red-400 border-b border-dashed border-red-500">data.items</span>.map(i =&gt; i.name)
-                    </p>
-                  </div>
-                </div>
 
-                {/* Output side */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-zinc-400 font-mono font-semibold">skillsync response</span>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="bg-zinc-905/90 rounded-xl p-4 border border-zinc-850">
-                      <p className="text-[10px] font-bold text-zinc-505 uppercase tracking-wider mb-1">Root Cause</p>
-                      <p className="text-xs text-zinc-300 leading-relaxed font-sans">
-                        <span className="text-red-400 font-mono">.map()</span> called before API response arrived. State initialized as <span className="text-yellow-400 font-mono">null</span>.
-                      </p>
-                    </div>
-                    <div className="bg-indigo-950/25 rounded-xl p-4 border border-indigo-500/20 shadow-md">
-                      <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-1">Fix</p>
-                      <p className="text-xs font-mono text-indigo-200">
-                        const items = (data?.items ?? []).map(i =&gt; i.name)
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 pt-1">
-                      <span className="badge-error px-2.5 py-0.5 rounded-full text-[10px] font-semibold">High Severity</span>
-                      <span className="badge-success px-2.5 py-0.5 rounded-full text-[10px] font-semibold">94% Confidence</span>
-                    </div>
-                  </div>
+              {/* Right pane: output simulation */}
+              <div className="flex flex-col space-y-2">
+                <span className="text-[10px] font-bold text-[#FF6B35] uppercase tracking-wider">{activeSim.outputTitle}</span>
+                <div 
+                  className="flex-1 p-4 rounded border text-emerald-450 overflow-x-auto whitespace-pre leading-relaxed bg-[#0C0C0C]" 
+                  style={{ borderColor: 'var(--border)', color: '#4ade80' }}
+                >
+                  {activeSim.outputCode}
                 </div>
               </div>
             </div>
@@ -259,159 +301,92 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── FEATURES ─── */}
-      <section className="px-4 py-20 relative">
-        <div className="glow-orb bg-purple-600/10 w-[500px] h-[500px] bottom-0 right-[15%]" />
-        
-        <div className="max-w-6xl mx-auto relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-4">
-              Four tools. <span className="gradient-text font-black">Infinite productivity.</span>
+      {/* PLATFORM FEATURES GRID */}
+      <section className="py-20 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16 select-none font-mono">
+            <span className="text-xs text-[#FF6B35] tracking-wider uppercase font-semibold">SKILLSYNC ENVIRONMENT</span>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mt-2 text-[#F8F8F8]">
+              Engineered Developer Workspace
             </h2>
-            <p className="text-zinc-400 text-lg max-w-xl mx-auto">
-              Everything a developer needs, supercharged with AI.
+            <p className="text-zinc-500 text-sm mt-3 max-w-lg mx-auto">
+              Flat surfaces, absolute precision layout design, and fast cognitive summaries.
             </p>
-          </motion.div>
+          </div>
 
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid md:grid-cols-2 gap-6"
-          >
-            {FEATURES.map((f) => {
-              const Icon = f.icon
+          <div className="grid md:grid-cols-2 gap-6">
+            {SIMULATIONS.map((s, idx) => {
+              const Icon = s.icon
               return (
-                <motion.div
-                  key={f.title}
-                  variants={itemVariants}
-                  whileHover={{ y: -6, transition: { duration: 0.3 } }}
-                  className="glass glass-hover rounded-3xl p-8 cursor-pointer relative overflow-hidden group"
+                <div 
+                  key={s.id}
                   onClick={() => navigate('/dashboard/error-explainer')}
+                  className="border rounded-md p-6 bg-[#151515] transition-all hover:border-[#FF6B35] cursor-pointer group"
+                  style={{ borderColor: 'var(--border)' }}
                 >
-                  {/* Subtle hover background highlight */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-transparent to-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  {/* Colored glow effect */}
-                  <div className="absolute -right-20 -top-20 w-48 h-48 rounded-full blur-[80px] pointer-events-none group-hover:opacity-100 opacity-60 transition-opacity duration-500"
-                       style={{ background: f.glow }} />
-
-                  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className="w-5.5 h-5.5 text-white" />
+                  <div className="w-9 h-9 rounded border flex items-center justify-center mb-4 text-[#FF6B35] bg-[#0A0A0A]" style={{ borderColor: 'var(--border-solid)' }}>
+                    <Icon className="w-4 h-4" />
                   </div>
-                  
-                  <h3 className="text-xl font-bold text-white mb-2.5 flex items-center gap-2 group-hover:text-indigo-400 transition-colors">
-                    {f.title}
-                    <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                  <h3 className="text-sm font-bold text-[#F8F8F8] font-mono mb-2 flex items-center gap-2 group-hover:text-[#FF6B35] transition-colors">
+                    {s.label}
+                    <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                   </h3>
-                  
-                  <p className="text-sm text-zinc-400 leading-relaxed mb-6">{f.desc}</p>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    {f.tags.map(tag => (
-                      <span key={tag} className="px-2.5 py-1 rounded-lg bg-zinc-900/60 text-zinc-400 text-xs border border-zinc-800/80 group-hover:border-zinc-700/50 transition-colors">
-                        {tag}
-                      </span>
-                    ))}
+                  <p className="text-zinc-400 text-xs leading-relaxed mb-4">
+                    {s.id === 'error' && 'Inject raw trace logs or visual screen snips to parse exact memory addresses and resolve code faults instantly.'}
+                    {s.id === 'docs' && 'Scan files, directories, or repository streams. Produce unified README setups and code catalogs automatically.'}
+                    {s.id === 'simplify' && 'Format, flatten, and restructure deeply nested logical checks or loops. Extract redundancies cleanly.'}
+                    {s.id === 'ui-to-code' && 'Transform visual sketches and screenshots into production ready React web modules.'}
+                  </p>
+                  <div className="flex gap-2">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#0A0A0A] text-zinc-500 border border-zinc-900">
+                      v2.5 cognitive core
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#0A0A0A] text-zinc-500 border border-zinc-900">
+                      active tele
+                    </span>
                   </div>
-                </motion.div>
+                </div>
               )
             })}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── WHY DEVELOPERS LOVE IT ─── */}
-      <section className="px-4 py-20 bg-gradient-to-b from-transparent via-zinc-950/20 to-transparent relative">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-4">
-              Why developers <span className="gradient-text font-black">love it</span>
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((t, i) => (
-              <motion.div
-                key={t.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.6 }}
-                className="glass rounded-3xl p-6 relative overflow-hidden group hover:border-zinc-700/50 transition-all duration-300"
-              >
-                <div className="flex items-center gap-1.5 mb-4">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-zinc-300 leading-relaxed mb-6 italic">"{t.text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0 shadow-md">
-                    {t.avatar}
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-white group-hover:text-indigo-400 transition-colors">{t.name}</p>
-                    <p className="text-[11px] text-zinc-500">{t.role}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
           </div>
         </div>
       </section>
 
-      {/* ─── CTA ─── */}
-      <section className="px-4 py-24 relative overflow-hidden">
-        <div className="glow-orb bg-purple-650/10 w-[400px] h-[400px] top-[10%] left-[50%] -translate-x-1/2" />
-        
-        <div className="max-w-3xl mx-auto text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="glass rounded-3xl p-12 md:p-16 border border-zinc-850 shadow-2xl relative overflow-hidden group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/[0.02] to-purple-500/[0.02]" />
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform duration-300 animate-float">
-              <Zap className="w-8 h-8 text-white" />
+      {/* STATS TELEMETRY SECTION */}
+      <section className="py-16 px-6 border-t" style={{ borderColor: 'var(--border)', backgroundColor: '#101010' }}>
+        <div className="max-w-5xl mx-auto font-mono">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="p-4 border rounded bg-[#0A0A0A]" style={{ borderColor: 'var(--border)' }}>
+              <div className="text-2xl font-bold text-[#FF6B35]">150ms</div>
+              <div className="text-[10px] text-zinc-500 mt-1 uppercase tracking-wider">Mean Latency</div>
             </div>
-            <h2 className="text-4xl font-extrabold mb-4 leading-tight">
-              Ready to ship <span className="gradient-text font-black">10x faster?</span>
-            </h2>
-            <p className="text-zinc-400 mb-8 text-lg max-w-md mx-auto">
-              Join thousands of developers who use SkillSync AI every day.
-            </p>
-            <button
-              id="cta-get-started"
-              onClick={() => navigate('/dashboard/error-explainer')}
-              className="btn-primary text-lg px-8 py-4 shadow-xl hover:shadow-indigo-500/40"
-            >
-              Launch SkillSync AI
-              <ChevronRight className="w-5 h-5" />
-            </button>
-            <p className="text-xs mt-4 text-zinc-500">Free · No credit card · Demo mode included</p>
-          </motion.div>
+            <div className="p-4 border rounded bg-[#0A0A0A]" style={{ borderColor: 'var(--border)' }}>
+              <div className="text-2xl font-bold text-[#FF6B35]">98.6%</div>
+              <div className="text-[10px] text-zinc-500 mt-1 uppercase tracking-wider">Parsing Success</div>
+            </div>
+            <div className="p-4 border rounded bg-[#0A0A0A]" style={{ borderColor: 'var(--border)' }}>
+              <div className="text-2xl font-bold text-[#FF6B35]">3M+</div>
+              <div className="text-[10px] text-zinc-500 mt-1 uppercase tracking-wider">Tokens Computed</div>
+            </div>
+            <div className="p-4 border rounded bg-[#0A0A0A]" style={{ borderColor: 'var(--border)' }}>
+              <div className="text-2xl font-bold text-[#FF6B35]">4.9 / 5</div>
+              <div className="text-[10px] text-zinc-500 mt-1 uppercase tracking-wider">Accuracy Review</div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-zinc-850 px-4 py-8 text-center relative">
-        <p className="text-zinc-500 text-xs">
-          © 2026 SkillSync AI · Built with ❤️ for developers · Powered by Gemini
-        </p>
+      {/* FOOTER */}
+      <footer className="border-t border-zinc-900 px-6 py-8 text-center font-mono text-[11px] text-zinc-650" style={{ borderColor: 'var(--border)' }}>
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Cpu className="w-3.5 h-3.5 text-[#FF6B35]" />
+            <span className="font-bold text-zinc-400">SkillSync AI Workspace</span>
+          </div>
+          <p className="text-zinc-650">
+            © 2026 SkillSync AI · Connected to Secure Environment · Sandbox: active
+          </p>
+        </div>
       </footer>
     </div>
   )

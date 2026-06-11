@@ -1,44 +1,106 @@
 import { useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { motion } from 'framer-motion'
-import { User } from 'lucide-react'
+import { Folder, ChevronRight, User, Terminal } from 'lucide-react'
 import ThemeToggle from '../ui/ThemeToggle'
 
-const PAGE_NAMES = {
-  '/dashboard/error-explainer': 'AI Error Explainer',
-  '/dashboard/docs-generator': 'Documentation Generator',
-  '/dashboard/code-simplifier': 'Code Simplifier',
-  '/dashboard/ui-to-code': 'UI to Code',
+const BREADCRUMBS = {
+  '/dashboard/error-explainer': ['src', 'pages', 'ErrorExplainer.jsx'],
+  '/dashboard/docs-generator': ['src', 'pages', 'DocsGenerator.jsx'],
+  '/dashboard/code-simplifier': ['src', 'pages', 'CodeSimplifier.jsx'],
+  '/dashboard/ui-to-code': ['src', 'pages', 'UIToCode.jsx'],
 }
 
 export default function Navbar() {
   const { pathname } = useLocation()
-  const pageName = PAGE_NAMES[pathname] || 'Dashboard'
+  const { user, logout } = useApp()
+  
+  const crumbs = BREADCRUMBS[pathname] || ['src', 'pages', 'Dashboard.jsx']
 
   return (
     <header
-      className="flex items-center justify-between px-5 py-3 border-b backdrop-blur-md flex-shrink-0 transition-colors duration-300"
-      style={{ borderColor: 'var(--border)', background: 'var(--bg-surface)' }}
+      className="flex items-center justify-between px-6 py-3 border-b flex-shrink-0 select-none font-mono"
+      style={{ 
+        borderColor: 'var(--border)', 
+        background: 'var(--bg-surface)' 
+      }}
     >
-      {/* Page title */}
-      <motion.h1
-        key={pageName}
-        initial={{ opacity: 0, y: -6 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-sm font-semibold"
-        style={{ color: 'var(--text-primary)' }}
-      >
-        {pageName}
-      </motion.h1>
+      {/* 1. IDE Breadcrumbs */}
+      <div className="flex items-center gap-2 text-xs">
+        <Folder className="w-3.5 h-3.5 text-zinc-500" />
+        <span className="text-zinc-400 font-semibold">skillsync-ai</span>
+        <ChevronRight className="w-3 h-3 text-zinc-600" />
+        {crumbs.map((crumb, idx) => {
+          const isLast = idx === crumbs.length - 1
+          return (
+            <div key={crumb} className="flex items-center gap-2">
+              <span className={isLast ? 'text-[#FF6B35] font-bold' : 'text-zinc-500'}>
+                {crumb}
+              </span>
+              {!isLast && <ChevronRight className="w-3 h-3 text-zinc-600" />}
+            </div>
+          )
+        })}
+      </div>
 
-      <div className="flex items-center gap-3">
+      {/* 2. Global Actions Area */}
+      <div className="flex items-center gap-4">
+        {/* API Server status ping */}
+        <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          COGNITION: ONLINE
+        </div>
+
+        {/* Search trigger helper */}
+        <button
+          onClick={() => {
+            // Dispatch a Ctrl+K keydown event manually to trigger palette
+            const e = new KeyboardEvent('keydown', {
+              key: 'k',
+              ctrlKey: true,
+              metaKey: true,
+              bubbles: true
+            })
+            window.dispatchEvent(e)
+          }}
+          className="hidden md:flex items-center gap-2 px-3 py-1 text-xs rounded border hover:border-zinc-500 transition-colors"
+          style={{
+            backgroundColor: 'var(--bg-base)',
+            borderColor: 'var(--border)',
+            color: 'var(--text-secondary)'
+          }}
+        >
+          <span>Quick Command</span>
+          <kbd className="px-1.5 py-0.5 rounded text-[10px] bg-zinc-800 border border-zinc-700 text-zinc-400">Ctrl K</kbd>
+        </button>
+
         {/* Theme toggle */}
         <ThemeToggle />
 
-        {/* Avatar */}
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center cursor-pointer hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-shadow">
-          <User className="w-4 h-4 text-white" />
-        </div>
+        {/* Profile / Avatar */}
+        {user ? (
+          <div className="flex items-center gap-2 group relative">
+            <button
+              onClick={logout}
+              className="w-7 h-7 rounded border flex items-center justify-center overflow-hidden hover:border-[#FF6B35] transition-colors bg-zinc-900"
+              style={{ borderColor: 'var(--border-solid)' }}
+              title="Click to logout"
+            >
+              {user.picture ? (
+                <img src={user.picture} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-xs font-bold text-white uppercase">{user.name?.[0] || 'U'}</span>
+              )}
+            </button>
+          </div>
+        ) : (
+          <div 
+            className="w-7 h-7 rounded border flex items-center justify-center bg-zinc-900"
+            style={{ borderColor: 'var(--border)' }}
+          >
+            <User className="w-3.5 h-3.5 text-zinc-500" />
+          </div>
+        )}
       </div>
     </header>
   )

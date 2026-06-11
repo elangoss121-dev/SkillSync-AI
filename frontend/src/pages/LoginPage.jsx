@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, EyeOff, Mail, Lock, User, Zap, ArrowRight, Check, Sparkles } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, User, Cpu, ArrowRight, Check, Sparkles } from 'lucide-react'
 import axios from 'axios'
 import { useApp } from '../context/AppContext'
 
-// Relative URL in production = same Vercel domain handles /api/* via serverless
-// For local dev: create frontend/.env.local with VITE_API_URL=http://localhost:8000
 const API_BASE = import.meta.env.VITE_API_URL || ''
 
 // Password strength checker
@@ -18,31 +16,10 @@ function getPasswordStrength(password) {
   if (/[0-9]/.test(password)) score++
   if (/[^A-Za-z0-9]/.test(password)) score++
   if (score <= 1) return { label: 'Weak',   color: '#ef4444', pct: 20  }
-  if (score <= 2) return { label: 'Fair',   color: '#f97316', pct: 40  }
-  if (score <= 3) return { label: 'Good',   color: '#eab308', pct: 60  }
-  if (score <= 4) return { label: 'Strong', color: '#22c55e', pct: 80  }
-  return              { label: 'Great!',  color: '#10b981', pct: 100 }
-}
-
-function FloatingOrb({ style }) {
-  return (
-    <div
-      className="absolute rounded-full pointer-events-none"
-      style={{
-        background: style.bg,
-        width: style.size,
-        height: style.size,
-        top: style.top,
-        left: style.left,
-        right: style.right,
-        bottom: style.bottom,
-        filter: 'blur(80px)',
-        opacity: 0.25,
-        animation: `float ${style.duration} ease-in-out infinite`,
-        animationDelay: style.delay,
-      }}
-    />
-  )
+  if (score <= 2) return { label: 'Fair',   color: '#FF6B35', pct: 40  }
+  if (score <= 3) return { label: 'Good',   color: '#FF8C5A', pct: 60  }
+  if (score <= 4) return { label: 'Strong', color: '#10b981', pct: 80  }
+  return              { label: 'Great!',  color: '#059669', pct: 100 }
 }
 
 export default function LoginPage() {
@@ -104,10 +81,9 @@ export default function LoginPage() {
   // Check if already logged in
   useEffect(() => {
     const token = localStorage.getItem('skillsync_token')
-    if (token) navigate('/dashboard', { replace: true })
+    if (token) navigate('/dashboard/error-explainer', { replace: true })
   }, [navigate])
 
-  // Reset state on tab switch
   const switchTab = (t) => {
     setTab(t)
     setError('')
@@ -131,7 +107,7 @@ export default function LoginPage() {
         localStorage.setItem('skillsync_token', data.token)
         localStorage.setItem('skillsync_user', JSON.stringify(data.user))
         setSuccess(`Welcome, ${data.user.name}! Redirecting…`)
-        setTimeout(() => navigate('/dashboard'), 1200)
+        setTimeout(() => navigate('/dashboard/error-explainer'), 1200)
       } else {
         const { data } = await axios.post(`${API_BASE}/api/auth/login`, {
           email, password,
@@ -139,7 +115,7 @@ export default function LoginPage() {
         localStorage.setItem('skillsync_token', data.token)
         localStorage.setItem('skillsync_user', JSON.stringify(data.user))
         setSuccess(`Welcome back, ${data.user.name}! Redirecting…`)
-        setTimeout(() => navigate('/dashboard'), 1200)
+        setTimeout(() => navigate('/dashboard/error-explainer'), 1200)
       }
     } catch (err) {
       const msg = err?.response?.data?.detail || 'Something went wrong. Please try again.'
@@ -150,83 +126,88 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4"
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4 font-mono"
          style={{ background: 'var(--bg-base)' }}>
 
-      {/* ── animated background ── */}
-      <div className="absolute inset-0 bg-grid opacity-35" />
-      <FloatingOrb style={{ bg: 'linear-gradient(135deg,#6366f1,#a855f7)', size: '600px', top: '-10%',  left: '-15%', duration: '8s',  delay: '0s'   }} />
-      <FloatingOrb style={{ bg: 'linear-gradient(135deg,#22d3ee,#6366f1)', size: '500px', bottom: '-5%', right: '-10%', duration: '10s', delay: '-3s'  }} />
-      <FloatingOrb style={{ bg: 'linear-gradient(135deg,#a855f7,#ec4899)', size: '300px', top: '50%',   right: '20%',  duration: '7s',  delay: '-5s'  }} />
+      {/* Grid lines background */}
+      <div className="absolute inset-0 bg-grid opacity-20 pointer-events-none" />
 
-      {/* ── card ── */}
+      {/* Subtle Electric Orange center glow */}
+      <div 
+        className="absolute w-[500px] h-[300px] rounded-full blur-[140px] pointer-events-none opacity-20"
+        style={{ 
+          background: 'radial-gradient(circle, rgba(255, 107, 53, 0.15) 0%, transparent 80%)',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)'
+        }}
+      />
+
       <motion.div
-        initial={{ opacity: 0, y: 40, scale: 0.96 }}
+        initial={{ opacity: 0, y: 30, scale: 0.98 }}
         animate={{ opacity: 1, y: 0,  scale: 1     }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10 w-full max-w-md animate-fade-in"
+        className="relative z-10 w-full max-w-md"
       >
-        {/* glassmorphism card */}
-        <div className="glass rounded-3xl p-8 shadow-2xl relative overflow-hidden"
-             style={{ boxShadow: '0 0 0 1px var(--border), 0 32px 80px rgba(0,0,0,0.5)' }}>
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/[0.02] to-purple-500/[0.02] pointer-events-none" />
+        {/* Graphite credentials card */}
+        <div className="rounded-lg p-8 shadow-2xl border bg-[#151515]"
+             style={{ borderColor: 'var(--border-solid)' }}>
 
-          {/* logo & brand */}
-          <div className="text-center mb-8 relative z-10">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 shadow-lg shadow-indigo-500/10"
-                 style={{ background: 'linear-gradient(135deg,#6366f1,#a855f7)' }}>
-              <Zap size={26} color="white" strokeWidth={2.5} />
+          {/* Logo header */}
+          <div className="text-center mb-8 select-none">
+            <div 
+              className="inline-flex items-center justify-center w-12 h-12 rounded border mb-4 bg-[#0A0A0A]"
+              style={{ borderColor: '#FF6B35' }}
+            >
+              <Cpu size={20} className="text-[#FF6B35]" />
             </div>
-            <h1 className="text-2xl font-bold gradient-text">SkillSync AI</h1>
-            <p className="text-sm mt-1.5" style={{ color: 'var(--text-secondary)' }}>
-              {tab === 'login' ? 'Sign in to your workspace' : 'Create your free account'}
+            <h1 className="text-xl font-bold text-white tracking-tight">skillsync.ai</h1>
+            <p className="text-xs mt-1.5 text-zinc-400">
+              {tab === 'login' ? 'SIGN_IN_SESSION' : 'PROVISION_USER_ACCOUNT'}
             </p>
           </div>
 
-          {/* tab switcher */}
-          <div className="flex rounded-xl p-1 mb-6 border relative z-10"
-               style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border)' }}>
+          {/* Tab Switcher */}
+          <div className="flex rounded p-1 mb-6 border bg-[#0A0A0A]"
+               style={{ borderColor: 'var(--border)' }}>
             {['login', 'signup'].map((t) => (
               <button
                 key={t}
                 onClick={() => switchTab(t)}
-                className="flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-300 select-none outline-none focus:outline-none"
+                className="flex-1 py-1.5 text-xs font-semibold rounded transition-colors duration-200 select-none outline-none focus:outline-none"
                 style={{
-                  background: tab === t ? 'linear-gradient(135deg,#6366f1,#a855f7)' : 'transparent',
-                  color:      tab === t ? 'white' : 'var(--text-secondary)',
-                  boxShadow:  tab === t ? '0 4px 15px rgba(99,102,241,0.25)' : 'none',
+                  background: tab === t ? '#FF6B35' : 'transparent',
+                  color:      tab === t ? '#0A0A0A' : 'var(--text-secondary)',
                 }}
               >
-                {t === 'login' ? 'Sign In' : 'Sign Up'}
+                {t === 'login' ? 'Sign In' : 'Register'}
               </button>
             ))}
           </div>
 
-          {/* ── form ── */}
-          <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
             <AnimatePresence mode="wait">
               {tab === 'signup' && (
                 <motion.div
                   key="name-field"
-                  initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                  animate={{ opacity: 1, height: 'auto', marginBottom: 0 }}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.25 }}
+                  transition={{ duration: 0.2 }}
                   style={{ overflow: 'hidden' }}
                 >
-                  <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider"
-                         style={{ color: 'var(--text-muted)' }}>Full Name</label>
+                  <label className="block text-[10px] font-bold mb-1.5 uppercase tracking-wider text-zinc-500">Full Name</label>
                   <div className="relative">
-                    <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-                          style={{ color: 'var(--text-muted)' }} />
+                    <User size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500" />
                     <input
                       id="auth-name"
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="John Doe"
+                      placeholder="Username"
                       required={tab === 'signup'}
-                      className="input-dark pl-10"
+                      className="input-dark pl-10 text-xs"
                     />
                   </div>
                 </motion.div>
@@ -234,65 +215,61 @@ export default function LoginPage() {
             </AnimatePresence>
 
             <div>
-              <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider"
-                     style={{ color: 'var(--text-muted)' }}>Email Address</label>
+              <label className="block text-[10px] font-bold mb-1.5 uppercase tracking-wider text-zinc-500">Email Address</label>
               <div className="relative">
-                <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-                      style={{ color: 'var(--text-muted)' }} />
+                <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500" />
                 <input
                   id="auth-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder="name@domain.com"
                   required
-                  className="input-dark pl-10"
+                  className="input-dark pl-10 text-xs"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider"
-                     style={{ color: 'var(--text-muted)' }}>Password</label>
+              <label className="block text-[10px] font-bold mb-1.5 uppercase tracking-wider text-zinc-500">Password</label>
               <div className="relative">
-                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-                      style={{ color: 'var(--text-muted)' }} />
+                <Lock size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500" />
                 <input
                   id="auth-password"
                   type={showPass ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder={tab === 'signup' ? 'At least 6 characters' : 'Your password'}
+                  placeholder={tab === 'signup' ? 'Min 6 characters' : 'Enter secret'}
                   required
-                  className="input-dark pl-10 pr-10"
+                  className="input-dark pl-10 pr-10 text-xs"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-350 outline-none focus:outline-none"
                 >
-                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
               </div>
 
-              {/* password strength bar */}
+              {/* Password strength */}
               <AnimatePresence>
                 {tab === 'signup' && password.length > 0 && (
                   <motion.div
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
-                    className="mt-2.5"
+                    className="mt-2"
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Strength</span>
-                      <span className="text-[11px] font-bold" style={{ color: strength.color }}>{strength.label}</span>
+                    <div className="flex items-center justify-between mb-1 text-[10px]">
+                      <span className="text-zinc-500">Security Check:</span>
+                      <span className="font-bold" style={{ color: strength.color }}>{strength.label}</span>
                     </div>
-                    <div className="h-1.5 rounded-full overflow-hidden border" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border)' }}>
+                    <div className="h-1 rounded-full overflow-hidden bg-[#0A0A0A]">
                       <motion.div
                         className="h-full rounded-full"
                         animate={{ width: `${strength.pct}%` }}
-                        transition={{ duration: 0.4 }}
+                        transition={{ duration: 0.3 }}
                         style={{ background: strength.color }}
                       />
                     </div>
@@ -301,14 +278,13 @@ export default function LoginPage() {
               </AnimatePresence>
             </div>
 
-            {/* error / success messages */}
+            {/* Error / Success messages */}
             <AnimatePresence>
               {error && (
                 <motion.div
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="rounded-xl px-4 py-3 text-sm font-semibold border"
+                  className="rounded px-4 py-2.5 text-xs font-semibold border"
                   style={{ background: 'rgba(239,68,68,0.08)', color: '#f87171', borderColor: 'rgba(239,68,68,0.15)' }}
                 >
                   {error}
@@ -318,76 +294,67 @@ export default function LoginPage() {
                 <motion.div
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="rounded-xl px-4 py-3 text-sm font-semibold border flex items-center gap-2"
+                  className="rounded px-4 py-2.5 text-xs font-semibold border flex items-center gap-2"
                   style={{ background: 'rgba(34,197,94,0.08)', color: '#4ade80', borderColor: 'rgba(34,197,94,0.15)' }}
                 >
-                  <Check size={16} /> {success}
+                  <Check size={14} /> {success}
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* submit button */}
-            <motion.button
+            {/* Submit button */}
+            <button
               id="auth-submit"
               type="submit"
               disabled={loading}
-              whileHover={{ scale: loading ? 1 : 1.01, y: loading ? 0 : -1 }}
-              whileTap={{ scale: loading ? 1 : 0.99 }}
-              className="w-full py-3.5 rounded-xl font-bold text-sm text-white relative overflow-hidden btn-primary shadow-lg"
-              style={{
-                opacity: loading ? 0.7 : 1,
-              }}
+              className="w-full py-3 rounded text-xs font-bold btn-primary text-[#0A0A0A] disabled:opacity-50"
             >
-              <span className="flex items-center justify-center gap-2">
-                {loading ? (
-                  <>
-                    <svg className="animate-spin text-white" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-                    </svg>
-                    {tab === 'signup' ? 'Creating Account…' : 'Signing In…'}
-                  </>
-                ) : (
-                  <>
-                    <Sparkles size={16} />
-                    {tab === 'signup' ? 'Create Account' : 'Sign In'}
-                    <ArrowRight size={16} />
-                  </>
-                )}
-              </span>
-            </motion.button>
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin text-black" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                  </svg>
+                  Initializing Engine...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  <Sparkles size={14} />
+                  {tab === 'signup' ? 'Execute Registration' : 'Establish Connection'}
+                  <ArrowRight size={14} />
+                </span>
+              )}
+            </button>
           </form>
 
-          {/* divider */}
-          <div className="flex items-center my-5 text-zinc-500 text-xs font-semibold relative z-10">
-            <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800" />
-            <span className="px-3 uppercase tracking-wider text-[10px] text-zinc-400">Or continue with</span>
-            <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800" />
+          {/* Divider */}
+          <div className="flex items-center my-5 text-zinc-650 text-xs font-semibold">
+            <div className="flex-1 h-px bg-zinc-900" />
+            <span className="px-3 uppercase tracking-wider text-[9px] text-zinc-550">Or authenticate with</span>
+            <div className="flex-1 h-px bg-zinc-900" />
           </div>
 
-          {/* Google Sign-in Button Container */}
-          <div className="flex justify-center relative z-10" id="google-signin-btn-wrapper">
+          {/* Google Sign-in */}
+          <div className="flex justify-center" id="google-signin-btn-wrapper">
             <div id="google-signin-btn" style={{ minWidth: '382px' }} />
           </div>
 
-          {/* footer */}
-          <p className="text-center text-xs mt-6 relative z-10" style={{ color: 'var(--text-muted)' }}>
+          {/* Footer toggle */}
+          <p className="text-center text-[10px] mt-6 text-zinc-500">
             {tab === 'login'
-              ? "Don't have an account? "
-              : 'Already have an account? '}
+              ? "First time connecting? "
+              : 'Already configured? '}
             <button
               onClick={() => switchTab(tab === 'login' ? 'signup' : 'login')}
-              className="font-bold underline underline-offset-2"
-              style={{ color: '#a5b4fc' }}
+              className="font-bold underline underline-offset-2 text-[#FF6B35] hover:text-[#FF804F]"
             >
-              {tab === 'login' ? 'Sign up free' : 'Sign in'}
+              {tab === 'login' ? 'Register Account' : 'Back to Login'}
             </button>
           </p>
         </div>
 
-        {/* bottom trust line */}
-        <p className="text-center text-[11px] mt-4 font-medium" style={{ color: 'var(--text-muted)' }}>
-          🔒 Passwords are encrypted with bcrypt · Data stored locally
+        {/* Bottom security line */}
+        <p className="text-center text-[10px] mt-4 text-zinc-600">
+          🔒 Secure Transport Encryption (bcrypt active)
         </p>
       </motion.div>
     </div>
