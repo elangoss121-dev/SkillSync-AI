@@ -7,8 +7,8 @@ import sqlite3
 import random
 import os
 import shutil
+import bcrypt
 from pathlib import Path
-from passlib.context import CryptContext
 
 # ── paths ──────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,8 +26,9 @@ if os.environ.get("VERCEL"):
 else:
     DB_PATH  = BASE_DIR / "users.db"
 
-# ── password hashing ───────────────────────────────────────────────────────────
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+def hash_password(password: str) -> str:
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
 
 # ── avatar colour palette (randomly assigned at signup) ───────────────────────
 AVATAR_COLORS = [
@@ -107,8 +108,7 @@ def create_user(
     """
     Insert a new user. Returns the created user (public fields) as a dict,
     or None if the email / username already exists.
-    """
-    hashed       = pwd_context.hash(password)
+    hashed       = hash_password(password)
     avatar_color = random.choice(AVATAR_COLORS)
     # Auto-generate username from email if not provided
     if not username:
@@ -185,4 +185,7 @@ def update_last_login(user_id: int) -> None:
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    try:
+        return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+    except Exception:
+        return False
