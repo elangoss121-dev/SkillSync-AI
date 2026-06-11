@@ -5,12 +5,26 @@ Handles: table init, create user, fetch user, verify password
 
 import sqlite3
 import random
+import os
+import shutil
 from pathlib import Path
 from passlib.context import CryptContext
 
 # ── paths ──────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
-DB_PATH  = BASE_DIR / "users.db"
+
+if os.environ.get("VERCEL"):
+    DB_PATH = Path("/tmp") / "users.db"
+    # Copy checked-in database to /tmp to allow write access in serverless environment
+    if not DB_PATH.exists():
+        SEED_DB = BASE_DIR / "users.db"
+        if SEED_DB.exists():
+            try:
+                shutil.copy2(SEED_DB, DB_PATH)
+            except Exception:
+                pass
+else:
+    DB_PATH  = BASE_DIR / "users.db"
 
 # ── password hashing ───────────────────────────────────────────────────────────
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
