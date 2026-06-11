@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Search, Terminal, FileText, Code, Palette, LogOut, Sun, Moon, ArrowRight } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
 
-export default function CommandPalette() {
-  const [isOpen, setIsOpen] = useState(false)
+export default function CommandPalette({ isOpen, setIsOpen }) {
   const [search, setSearch] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const { theme, toggleTheme, user, logout } = useApp()
@@ -92,7 +91,7 @@ export default function CommandPalette() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [setIsOpen])
 
   useEffect(() => {
     if (isOpen) {
@@ -131,25 +130,9 @@ export default function CommandPalette() {
       document.addEventListener('mousedown', handleClickOutside)
     }
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [isOpen])
+  }, [isOpen, setIsOpen])
 
-  if (!isOpen) {
-    // Return a small visual command helper that user can see in headers
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="hidden md:flex items-center gap-2 px-3 py-1.5 text-xs font-mono rounded border hover:border-zinc-500 transition-colors"
-        style={{
-          backgroundColor: 'var(--bg-base)',
-          borderColor: 'var(--border)',
-          color: 'var(--text-secondary)'
-        }}
-      >
-        <span>Search actions...</span>
-        <kbd className="px-1.5 py-0.5 rounded text-[10px] bg-zinc-800 border border-zinc-700 text-zinc-400">Ctrl K</kbd>
-      </button>
-    )
-  }
+  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4 bg-black/70 backdrop-blur-sm animate-[fadeIn_0.15s_ease-out]">

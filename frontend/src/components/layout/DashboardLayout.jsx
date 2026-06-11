@@ -11,6 +11,7 @@ import { Cpu, Activity, Server, Radio, ChevronRight, X, Clock, BarChart2, Shield
 export default function DashboardLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isInsightsOpen, setIsInsightsOpen] = useState(false)
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
   const { theme } = useApp()
   const isDark = theme === 'dark'
 
@@ -33,7 +34,7 @@ export default function DashboardLayout() {
       style={{ background: 'var(--bg-base)' }}
     >
       {/* Global commands and assistant */}
-      <CommandPalette />
+      <CommandPalette isOpen={isCommandPaletteOpen} setIsOpen={setIsCommandPaletteOpen} />
       <FloatingAIAssistant />
 
       {/* 1. Left Sidebar Navigation (240px expanded / 72px collapsed) */}
@@ -45,6 +46,7 @@ export default function DashboardLayout() {
         <Navbar 
           onMenuClick={() => setMobileOpen(true)} 
           onInsightsToggle={() => setIsInsightsOpen(prev => !prev)}
+          onSearchClick={() => setIsCommandPaletteOpen(true)}
         />
         
         <div className="flex-grow overflow-y-auto flex justify-center p-6 bg-grid">

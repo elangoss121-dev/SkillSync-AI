@@ -20,7 +20,7 @@ function ComplexityBar({ score }) {
         <span className="text-zinc-550">Cognitive Complexity</span>
         <span className="font-bold" style={{ color }}>{score.toFixed(1)} / 10</span>
       </div>
-      <div className="h-1.5 bg-[#0A0A0A] dark:bg-[#0A0A0A] light:bg-[#F1F5F9] rounded-full overflow-hidden border border-zinc-900 dark:border-zinc-900 light:border-zinc-200">
+      <div className="h-1.5 rounded-full overflow-hidden border" style={{ backgroundColor: 'var(--bg-base)', borderColor: 'var(--border)' }}>
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -203,8 +203,12 @@ export default function CodeSimplifier() {
                     >
                       <div className="flex flex-col items-center">
                         <span 
-                          className="w-5 h-5 rounded-full border text-[9px] flex items-center justify-center font-bold bg-[#0A0A0A] dark:bg-[#0A0A0A] light:bg-[#F8FAFC] group-hover:bg-[#FF6B35] dark:group-hover:bg-[#FF6B35] light:group-hover:bg-[#6366F1] group-hover:text-white dark:group-hover:text-[#0A0A0A] light:group-hover:text-white transition-all duration-150 flex-shrink-0"
-                          style={{ color: 'var(--accent-primary)', borderColor: 'var(--accent-primary-glow)' }}
+                          className="w-5 h-5 rounded-full border text-[9px] flex items-center justify-center font-bold transition-all duration-150 flex-shrink-0 group-hover:bg-[color:var(--accent-primary)] group-hover:text-white dark:group-hover:text-zinc-950 cursor-default select-none"
+                          style={{ 
+                            color: 'var(--accent-primary)', 
+                            borderColor: 'var(--accent-primary-glow)',
+                            backgroundColor: 'var(--bg-base)'
+                          }}
                         >
                           {line.line}
                         </span>
