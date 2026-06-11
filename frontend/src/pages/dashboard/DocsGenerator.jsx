@@ -20,7 +20,7 @@ const TABS = [
 function MarkdownRenderer({ content }) {
   return (
     <ReactMarkdown
-      className="prose prose-invert prose-xs max-w-none text-zinc-300 font-mono leading-relaxed"
+      className="prose prose-invert prose-xs max-w-none text-zinc-800 dark:text-zinc-350 font-mono leading-relaxed"
       components={{
         code({ inline, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || '')
@@ -34,7 +34,7 @@ function MarkdownRenderer({ content }) {
               {String(children).replace(/\n$/, '')}
             </SyntaxHighlighter>
           ) : (
-            <code className="bg-zinc-900 px-1.5 py-0.5 rounded text-[#FF6B35] text-[10px] font-mono" {...props}>{children}</code>
+            <code className="bg-zinc-100 dark:bg-zinc-900 px-1.5 py-0.5 rounded text-[#FF6B35] text-[10px] font-mono" style={{ color: 'var(--accent-primary)' }} {...props}>{children}</code>
           )
         },
       }}
@@ -50,7 +50,8 @@ export default function DocsGenerator() {
   const [pastedCode, setPastedCode] = useState('')
   const [activeTab, setActiveTab] = useState('readme')
   const { run, loading, result, reset } = useAI('generateDocs')
-  const { addToast } = useApp()
+  const { addToast, theme } = useApp()
+  const isDark = theme === 'dark'
 
   const handleSubmit = () => {
     run({
@@ -83,10 +84,10 @@ export default function DocsGenerator() {
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div 
-          className="w-10 h-10 rounded border flex items-center justify-center bg-[#0A0A0A]"
-          style={{ borderColor: '#FF6B35' }}
+          className="w-10 h-10 rounded border flex items-center justify-center bg-zinc-50 dark:bg-[#0A0A0A]"
+          style={{ borderColor: 'var(--accent-primary)' }}
         >
-          <FileText className="w-5 h-5 text-[#FF6B35]" />
+          <FileText className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
         </div>
         <div>
           <h2 className="text-sm font-bold text-[var(--text-primary)] uppercase">Documentation Generator</h2>
@@ -97,13 +98,13 @@ export default function DocsGenerator() {
       {/* Input Section */}
       {!result && !loading && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 max-w-2xl">
-          <div className="rounded border bg-[#151515]" style={{ borderColor: 'var(--border-solid)' }}>
-            <div className="px-4 py-2 border-b bg-[#0A0A0A]" style={{ borderColor: 'var(--border)' }}>
+          <div className="rounded border workspace-card overflow-hidden" style={{ borderColor: 'var(--border-solid)' }}>
+            <div className="px-4 py-2 border-b font-semibold" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-elevated)' }}>
               <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Link className="w-3.5 h-3.5 text-[#FF6B35]" /> GitHub Repository Stream
+                <Link className="w-3.5 h-3.5" style={{ color: 'var(--accent-primary)' }} /> GitHub Repository Stream
               </label>
             </div>
-            <div className="p-4 bg-[#0F0F0F]">
+            <div className="p-4" style={{ backgroundColor: 'var(--bg-surface)' }}>
               <input
                 id="github-url-input"
                 type="url"
@@ -115,13 +116,13 @@ export default function DocsGenerator() {
             </div>
           </div>
 
-          <div className="rounded border bg-[#151515]" style={{ borderColor: 'var(--border-solid)' }}>
-            <div className="px-4 py-2 border-b bg-[#0A0A0A]" style={{ borderColor: 'var(--border)' }}>
+          <div className="rounded border workspace-card overflow-hidden" style={{ borderColor: 'var(--border-solid)' }}>
+            <div className="px-4 py-2 border-b" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-elevated)' }}>
               <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                 Upload Repository / Source File
               </label>
             </div>
-            <div className="p-4 bg-[#0F0F0F]">
+            <div className="p-4" style={{ backgroundColor: 'var(--bg-surface)' }}>
               <FileDropzone
                 id="docs-file-drop"
                 file={file}
@@ -134,13 +135,13 @@ export default function DocsGenerator() {
             </div>
           </div>
 
-          <div className="rounded border bg-[#151515]" style={{ borderColor: 'var(--border-solid)' }}>
-            <div className="px-4 py-2 border-b bg-[#0A0A0A]" style={{ borderColor: 'var(--border)' }}>
+          <div className="rounded border workspace-card overflow-hidden" style={{ borderColor: 'var(--border-solid)' }}>
+            <div className="px-4 py-2 border-b" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-elevated)' }}>
               <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                 Raw Code Paste
               </label>
             </div>
-            <div className="p-4 bg-[#0F0F0F]">
+            <div className="p-4" style={{ backgroundColor: 'var(--bg-surface)' }}>
               <textarea
                 id="docs-code-input"
                 className="textarea-dark h-32 text-xs"
@@ -163,7 +164,7 @@ export default function DocsGenerator() {
       )}
 
       {loading && (
-        <div className="rounded border p-8 max-w-2xl bg-[#151515]" style={{ borderColor: 'var(--border-solid)' }}>
+        <div className="rounded border p-8 max-w-2xl workspace-card" style={{ borderColor: 'var(--border-solid)' }}>
           <ThinkingLoader message="Assembling catalog documentation tree..." />
         </div>
       )}
@@ -176,9 +177,9 @@ export default function DocsGenerator() {
             className="space-y-4"
           >
             {/* Toolbar */}
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 bg-[#151515] p-2 border rounded" style={{ borderColor: 'var(--border-solid)' }}>
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 p-2 border rounded workspace-card" style={{ borderColor: 'var(--border-solid)' }}>
               <div className="flex items-center gap-3 flex-wrap">
-                <div className="flex items-center gap-1 p-0.5 bg-[#0A0A0A] border rounded" style={{ borderColor: 'var(--border)' }}>
+                <div className="flex items-center gap-1 p-0.5 border rounded" style={{ backgroundColor: 'var(--bg-elevated)', borderColor: 'var(--border)' }}>
                   {TABS.map(tab => {
                     const Icon = tab.icon
                     const isActive = activeTab === tab.id
@@ -187,8 +188,11 @@ export default function DocsGenerator() {
                         key={tab.id}
                         id={`docs-tab-${tab.id}`}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-1.5 px-3 py-1 rounded text-[10px] font-semibold transition-colors duration-150
-                          ${isActive ? 'bg-[#FF6B35] text-[#0A0A0A]' : 'text-zinc-400 hover:text-white'}`}
+                        className="flex items-center gap-1.5 px-3 py-1 rounded text-[10px] font-semibold transition-colors duration-150 border-0 outline-none"
+                        style={{
+                          backgroundColor: isActive ? 'var(--accent-primary)' : 'transparent',
+                          color: isActive ? 'var(--theme-toggle-active-text)' : 'var(--text-secondary)'
+                        }}
                       >
                         <Icon className="w-3 h-3" />
                         {tab.label}
@@ -197,7 +201,7 @@ export default function DocsGenerator() {
                   })}
                 </div>
                 {result?.model && (
-                  <span className="px-2.5 py-0.5 rounded text-[9px] border border-[#FF6B35]/20 bg-[#FF6B35]/5 text-[#FF6B35]">
+                  <span className="px-2.5 py-0.5 rounded text-[9px] border border-orange-500/20" style={{ color: 'var(--accent-primary)', backgroundColor: 'var(--accent-primary-glow)', borderColor: 'var(--accent-primary-glow)' }}>
                     {result.model}
                   </span>
                 )}
@@ -219,18 +223,18 @@ export default function DocsGenerator() {
             {/* Preview + Raw splits */}
             <div className="grid lg:grid-cols-2 gap-5">
               {/* Markdown preview */}
-              <div className="rounded border bg-[#151515] overflow-hidden" style={{ borderColor: 'var(--border-solid)' }}>
-                <div className="px-4 py-2 border-b bg-[#0A0A0A] text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5" style={{ borderColor: 'var(--border)' }}>
-                  <BookOpen className="w-3.5 h-3.5 text-[#FF6B35]" /> Markdown Viewer
+              <div className="rounded border overflow-hidden workspace-card" style={{ borderColor: 'var(--border-solid)' }}>
+                <div className="px-4 py-2 border-b text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-elevated)' }}>
+                  <BookOpen className="w-3.5 h-3.5" style={{ color: 'var(--accent-primary)' }} /> Markdown Viewer
                 </div>
-                <div className="p-5 overflow-y-auto max-h-[500px] bg-[#0C0C0C] no-scrollbar">
+                <div className="p-5 overflow-y-auto max-h-[500px] no-scrollbar" style={{ backgroundColor: 'var(--bg-surface)' }}>
                   <MarkdownRenderer content={activeContent} />
                 </div>
               </div>
               {/* Raw markdown */}
-              <div className="rounded border bg-[#151515] overflow-hidden" style={{ borderColor: 'var(--border-solid)' }}>
-                <div className="px-4 py-2 border-b bg-[#0A0A0A] text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5" style={{ borderColor: 'var(--border)' }}>
-                  <Code className="w-3.5 h-3.5 text-[#FF6B35]" /> Raw markdown source
+              <div className="rounded border overflow-hidden workspace-card" style={{ borderColor: 'var(--border-solid)' }}>
+                <div className="px-4 py-2 border-b text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-elevated)' }}>
+                  <Code className="w-3.5 h-3.5" style={{ color: 'var(--accent-primary)' }} /> Raw markdown source
                 </div>
                 <div className="bg-[#0C0C0C]">
                   <SyntaxHighlighter

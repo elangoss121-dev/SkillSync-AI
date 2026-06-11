@@ -34,6 +34,8 @@ export default function ErrorExplainer() {
   const [file, setFile] = useState(null)
   const [deepOpen, setDeepOpen] = useState(false)
   const { run, loading, result, reset } = useAI('explainError')
+  const { theme } = useApp()
+  const isDark = theme === 'dark'
 
   const handleSubmit = async () => {
     const payload = {
@@ -55,10 +57,10 @@ export default function ErrorExplainer() {
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div 
-          className="w-10 h-10 rounded border flex items-center justify-center bg-[#0A0A0A]"
-          style={{ borderColor: '#FF6B35' }}
+          className="w-10 h-10 rounded border flex items-center justify-center bg-zinc-50 dark:bg-[#0A0A0A]"
+          style={{ borderColor: 'var(--accent-primary)' }}
         >
-          <Bug className="w-5 h-5 text-[#FF6B35]" />
+          <Bug className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
         </div>
         <div>
           <h2 className="text-sm font-bold text-[var(--text-primary)] uppercase">AI Error Explainer</h2>
@@ -69,13 +71,13 @@ export default function ErrorExplainer() {
       <div className="grid lg:grid-cols-2 gap-6">
         {/* ─── LEFT: INPUT PANEL ─── */}
         <div className="space-y-4">
-          <div className="rounded border bg-[#151515]" style={{ borderColor: 'var(--border-solid)' }}>
-            <div className="px-4 py-2 border-b bg-[#0A0A0A]" style={{ borderColor: 'var(--border)' }}>
+          <div className="rounded border workspace-card overflow-hidden" style={{ borderColor: 'var(--border-solid)' }}>
+            <div className="px-4 py-2 border-b" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-elevated)' }}>
               <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                 Screenshot Upload
               </label>
             </div>
-            <div className="p-4 bg-[#0F0F0F]">
+            <div className="p-4" style={{ backgroundColor: 'var(--bg-surface)' }}>
               <FileDropzone
                 id="error-screenshot-drop"
                 file={file}
@@ -88,16 +90,20 @@ export default function ErrorExplainer() {
             </div>
           </div>
 
-          <div className="rounded border bg-[#151515]" style={{ borderColor: 'var(--border-solid)' }}>
-            <div className="flex items-center justify-between px-4 py-2 border-b bg-[#0A0A0A]" style={{ borderColor: 'var(--border)' }}>
+          <div className="rounded border workspace-card overflow-hidden" style={{ borderColor: 'var(--border-solid)' }}>
+            <div className="flex items-center justify-between px-4 py-2 border-b" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-elevated)' }}>
               <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                 Raw Trace / Error String
               </label>
-              <button onClick={handleDemo} className="text-[10px] font-bold text-[#FF6B35] hover:underline bg-transparent border-0 outline-none">
+              <button 
+                onClick={handleDemo} 
+                className="text-[10px] font-bold bg-transparent border-0 outline-none hover:underline"
+                style={{ color: 'var(--accent-primary)' }}
+              >
                 LOAD_SAMPLE_TRACE ↗
               </button>
             </div>
-            <div className="p-4 bg-[#0F0F0F]">
+            <div className="p-4" style={{ backgroundColor: 'var(--bg-surface)' }}>
               <textarea
                 id="error-text-input"
                 className="textarea-dark h-40 text-xs leading-relaxed"
@@ -113,7 +119,7 @@ export default function ErrorExplainer() {
               id="analyze-error-btn"
               onClick={handleSubmit}
               disabled={loading || (!text && !file)}
-              className="btn-primary flex-1 justify-center py-2.5 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-xs"
+              className="btn-primary flex-1 justify-center py-2.5 font-bold text-xs"
             >
               {loading ? (
                 <>
@@ -138,7 +144,7 @@ export default function ErrorExplainer() {
         {/* ─── RIGHT: DIAGNOSTIC LOGS PANEL ─── */}
         <div className="space-y-4">
           {loading && (
-            <div className="rounded border p-6 bg-[#151515]" style={{ borderColor: 'var(--border-solid)' }}>
+            <div className="rounded border p-6 workspace-card" style={{ borderColor: 'var(--border-solid)' }}>
               <ThinkingLoader message="Cognitive diagnostic sweep in progress..." />
             </div>
           )}
@@ -152,12 +158,12 @@ export default function ErrorExplainer() {
                 className="space-y-4"
               >
                 {/* Diagnostics Status Header */}
-                <div className="rounded border px-4 py-3 bg-[#151515] flex items-center justify-between" style={{ borderColor: 'var(--border-solid)' }}>
+                <div className="rounded border px-4 py-3 workspace-card flex items-center justify-between" style={{ borderColor: 'var(--border-solid)' }}>
                   <div className="flex items-center gap-3 flex-wrap">
                     <SeverityBadge severity={d.severity} />
-                    <span className="text-[10px] text-zinc-500">{d.error_type}</span>
+                    <span className="text-[10px] text-zinc-505">{d.error_type}</span>
                     {result?.model && (
-                      <span className="px-2.5 py-0.5 rounded text-[9px] border border-[#FF6B35]/20 bg-[#FF6B35]/5 text-[#FF6B35]">
+                      <span className="px-2.5 py-0.5 rounded text-[9px] border border-orange-500/20" style={{ color: 'var(--accent-primary)', backgroundColor: 'var(--accent-primary-glow)', borderColor: 'var(--accent-primary-glow)' }}>
                         {result.model}
                       </span>
                     )}
@@ -166,35 +172,35 @@ export default function ErrorExplainer() {
                 </div>
 
                 {/* Root Cause Analysis */}
-                <div className="rounded border p-5 bg-[#151515]" style={{ borderColor: 'var(--border-solid)' }}>
+                <div className="rounded border p-5 workspace-card" style={{ borderColor: 'var(--border-solid)' }}>
                   <div className="flex items-center gap-2 mb-2 select-none">
-                    <AlertTriangle className="w-3.5 h-3.5 text-[#FF6B35]" />
+                    <AlertTriangle className="w-3.5 h-3.5" style={{ color: 'var(--accent-primary)' }} />
                     <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Root Cause Analysis</span>
                   </div>
-                  <p className="text-xs text-zinc-300 leading-relaxed font-mono">
+                  <p className="text-xs text-zinc-708 dark:text-zinc-300 leading-relaxed font-mono">
                     <AITypingEffect text={d.probable_cause} speed={8} />
                   </p>
                 </div>
 
                 {/* Beginner friendly summary */}
-                <div className="rounded border p-5 bg-[#151515]" style={{ borderColor: 'var(--border-solid)' }}>
+                <div className="rounded border p-5 workspace-card" style={{ borderColor: 'var(--border-solid)' }}>
                   <div className="flex items-center gap-2 mb-2 select-none">
-                    <Lightbulb className="w-3.5 h-3.5 text-[#FFA07A]" />
+                    <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
                     <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Plain English Summary</span>
                   </div>
-                  <p className="text-xs text-zinc-300 leading-relaxed italic">"{d.beginner_explanation}"</p>
+                  <p className="text-xs text-zinc-708 dark:text-zinc-300 leading-relaxed italic">"{d.beginner_explanation}"</p>
                 </div>
 
                 {/* Step solutions */}
-                <div className="rounded border p-5 bg-[#151515]" style={{ borderColor: 'var(--border-solid)' }}>
+                <div className="rounded border p-5 workspace-card" style={{ borderColor: 'var(--border-solid)' }}>
                   <div className="flex items-center gap-2 mb-3 select-none">
-                    <Wrench className="w-3.5 h-3.5 text-emerald-450" />
+                    <Wrench className="w-3.5 h-3.5 text-emerald-500" />
                     <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Logical Remediations</span>
                   </div>
                   <ul className="space-y-2">
                     {d.fix_suggestions.map((fix, i) => (
-                      <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-300 leading-relaxed">
-                        <span className="flex-shrink-0 w-4 h-4 rounded-full border border-[#FF6B35]/30 text-[#FF6B35] text-[9px] flex items-center justify-center mt-0.5 font-bold">
+                      <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-708 dark:text-zinc-300 leading-relaxed">
+                        <span className="flex-shrink-0 w-4 h-4 rounded-full border text-[9px] flex items-center justify-center mt-0.5 font-bold" style={{ color: 'var(--accent-primary)', borderColor: 'var(--accent-primary-glow)' }}>
                           {i + 1}
                         </span>
                         {fix}
@@ -204,12 +210,12 @@ export default function ErrorExplainer() {
                 </div>
 
                 {/* Corrected Code IDE pane */}
-                <div className="rounded border overflow-hidden bg-[#151515]" style={{ borderColor: 'var(--border-solid)' }}>
-                  <div className="flex items-center justify-between px-4 py-2 border-b bg-[#0A0A0A]" style={{ borderColor: 'var(--border)' }}>
+                <div className="rounded border overflow-hidden workspace-card" style={{ borderColor: 'var(--border-solid)' }}>
+                  <div className="flex items-center justify-between px-4 py-2 border-b" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-elevated)' }}>
                     <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Corrected Output</span>
                     <CopyButton text={d.corrected_code} />
                   </div>
-                  <div className="bg-[#0C0C0C]">
+                  <div className="bg-[#0C0C0C] dark:bg-[#0C0C0C]">
                     <SyntaxHighlighter
                       language="javascript"
                       style={vscDarkPlus}
@@ -221,12 +227,12 @@ export default function ErrorExplainer() {
                 </div>
 
                 {/* Deep Analysis Accordion */}
-                <div className="rounded border overflow-hidden bg-[#151515]" style={{ borderColor: 'var(--border-solid)' }}>
+                <div className="rounded border overflow-hidden workspace-card" style={{ borderColor: 'var(--border-solid)' }}>
                   <button
                     onClick={() => setDeepOpen(o => !o)}
-                    className="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-zinc-800/20 transition-colors"
+                    className="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-zinc-800/10 transition-colors"
                   >
-                    <span className="text-xs font-semibold text-zinc-300">Deep System Analysis</span>
+                    <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Deep System Analysis</span>
                     {deepOpen ? <ChevronUp className="w-3.5 h-3.5 text-zinc-500" /> : <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />}
                   </button>
                   <AnimatePresence>
@@ -238,8 +244,8 @@ export default function ErrorExplainer() {
                         className="overflow-hidden border-t"
                         style={{ borderColor: 'var(--border)' }}
                       >
-                        <div className="px-5 py-4 bg-[#0F0F0F]">
-                          <p className="text-xs text-zinc-405 leading-relaxed">{d.deep_explanation}</p>
+                        <div className="px-5 py-4" style={{ backgroundColor: 'var(--bg-elevated)' }}>
+                          <p className="text-xs text-zinc-650 dark:text-zinc-400 leading-relaxed">{d.deep_explanation}</p>
                         </div>
                       </motion.div>
                     )}
@@ -251,12 +257,12 @@ export default function ErrorExplainer() {
 
           {/* Empty log state */}
           {!result && !loading && (
-            <div className="rounded border p-12 flex flex-col items-center justify-center text-center bg-[#151515]" style={{ borderColor: 'var(--border-solid)' }}>
-              <div className="w-12 h-12 rounded border border-[#FF6B35]/20 flex items-center justify-center mb-4 bg-[#0A0A0A]">
-                <Terminal className="w-6 h-6 text-[#FF6B35]" />
+            <div className="rounded border p-12 flex flex-col items-center justify-center text-center workspace-card" style={{ borderColor: 'var(--border-solid)' }}>
+              <div className="w-12 h-12 rounded border flex items-center justify-center mb-4 bg-zinc-50 dark:bg-[#0A0A0A]" style={{ borderColor: 'var(--border)' }}>
+                <Terminal className="w-6 h-6 text-zinc-400" />
               </div>
-              <p className="text-zinc-300 text-xs font-bold mb-1">NO DIAGNOSTIC SESSION</p>
-              <p className="text-zinc-650 text-[10px] uppercase">Submit a raw trace log or screenshot to map call stacks</p>
+              <p className="text-zinc-805 dark:text-zinc-350 text-xs font-bold mb-1 uppercase">NO DIAGNOSTIC SESSION</p>
+              <p className="text-zinc-500 text-[10px] uppercase">Submit a raw trace log or screenshot to map call stacks</p>
             </div>
           )}
         </div>

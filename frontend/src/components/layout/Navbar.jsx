@@ -1,7 +1,6 @@
 import { useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
-import { motion } from 'framer-motion'
-import { Folder, ChevronRight, User, Terminal } from 'lucide-react'
+import { Folder, ChevronRight, User, Menu } from 'lucide-react'
 import ThemeToggle from '../ui/ThemeToggle'
 
 const BREADCRUMBS = {
@@ -11,7 +10,7 @@ const BREADCRUMBS = {
   '/dashboard/ui-to-code': ['src', 'pages', 'UIToCode.jsx'],
 }
 
-export default function Navbar() {
+export default function Navbar({ onMenuClick }) {
   const { pathname } = useLocation()
   const { user, logout } = useApp()
   
@@ -25,16 +24,28 @@ export default function Navbar() {
         background: 'var(--bg-surface)' 
       }}
     >
-      {/* 1. IDE Breadcrumbs */}
-      <div className="flex items-center gap-2 text-xs">
-        <Folder className="w-3.5 h-3.5 text-zinc-500" />
-        <span className="text-zinc-400 font-semibold">skillsync-ai</span>
-        <ChevronRight className="w-3 h-3 text-zinc-600" />
+      {/* 1. Hamburger menu (mobile only) & IDE Breadcrumbs */}
+      <div className="flex items-center gap-3 text-xs">
+        <button
+          onClick={onMenuClick}
+          className="md:hidden p-1.5 rounded hover:bg-zinc-105 dark:hover:bg-zinc-800 text-zinc-500 border bg-transparent"
+          style={{ borderColor: 'var(--border)' }}
+          title="Toggle Navigation Menu"
+        >
+          <Menu className="w-4 h-4" />
+        </button>
+
+        <div className="hidden sm:flex items-center gap-2">
+          <Folder className="w-3.5 h-3.5 text-zinc-500" />
+          <span className="text-zinc-400 font-semibold">skillsync-ai</span>
+          <ChevronRight className="w-3 h-3 text-zinc-600" />
+        </div>
+
         {crumbs.map((crumb, idx) => {
           const isLast = idx === crumbs.length - 1
           return (
             <div key={crumb} className="flex items-center gap-2">
-              <span className={isLast ? 'text-[#FF6B35] font-bold' : 'text-zinc-500'}>
+              <span className={isLast ? 'text-[#FF6B35] dark:text-[#FF6B35] font-bold' : 'text-zinc-500'} style={{ color: isLast ? 'var(--accent-primary)' : undefined }}>
                 {crumb}
               </span>
               {!isLast && <ChevronRight className="w-3 h-3 text-zinc-600" />}
@@ -46,7 +57,7 @@ export default function Navbar() {
       {/* 2. Global Actions Area */}
       <div className="flex items-center gap-4">
         {/* API Server status ping */}
-        <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+        <div className="hidden lg:flex items-center gap-1.5 text-[10px] text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
           COGNITION: ONLINE
         </div>
@@ -54,7 +65,6 @@ export default function Navbar() {
         {/* Search trigger helper */}
         <button
           onClick={() => {
-            // Dispatch a Ctrl+K keydown event manually to trigger palette
             const e = new KeyboardEvent('keydown', {
               key: 'k',
               ctrlKey: true,

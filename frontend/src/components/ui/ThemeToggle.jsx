@@ -8,10 +8,10 @@ export default function ThemeToggle() {
 
   return (
     <div 
-      className="relative flex items-center p-1 rounded-md border transition-all duration-300 select-none cursor-pointer"
+      className="relative flex items-center p-1 rounded border transition-all duration-300 select-none cursor-pointer"
       style={{
         backgroundColor: 'var(--bg-surface)',
-        borderColor: 'var(--border-solid)',
+        borderColor: 'var(--border)',
         width: '160px',
         height: '34px'
       }}
@@ -23,7 +23,7 @@ export default function ThemeToggle() {
         style={{
           left: isDark ? 'calc(50% + 1px)' : '3px',
           width: 'calc(50% - 4px)',
-          background: isDark ? '#FF6B35' : '#0A0A0A',
+          background: 'var(--theme-toggle-pill)',
         }}
         layout
         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
@@ -31,11 +31,10 @@ export default function ThemeToggle() {
 
       {/* Light Option Button */}
       <div
-        className={`relative z-10 flex-1 h-full flex items-center justify-center gap-1.5 text-xs font-semibold transition-colors duration-200 outline-none ${
-          !isDark 
-            ? 'text-[#F8F8F8]' 
-            : 'text-zinc-500'
-        }`}
+        className="relative z-10 flex-1 h-full flex items-center justify-center gap-1.5 text-xs font-semibold transition-colors duration-200 outline-none"
+        style={{
+          color: !isDark ? 'var(--theme-toggle-active-text)' : 'var(--text-secondary)'
+        }}
       >
         <Sun className="w-3.5 h-3.5 flex-shrink-0" />
         <span>Light Mode</span>
@@ -43,11 +42,10 @@ export default function ThemeToggle() {
 
       {/* Dark Option Button */}
       <div
-        className={`relative z-10 flex-1 h-full flex items-center justify-center gap-1.5 text-xs font-semibold transition-colors duration-200 outline-none ${
-          isDark 
-            ? 'text-[#0A0A0A]' 
-            : 'text-zinc-500'
-        }`}
+        className="relative z-10 flex-1 h-full flex items-center justify-center gap-1.5 text-xs font-semibold transition-colors duration-200 outline-none"
+        style={{
+          color: isDark ? 'var(--theme-toggle-active-text)' : 'var(--text-secondary)'
+        }}
       >
         <Moon className="w-3.5 h-3.5 flex-shrink-0" />
         <span>Dark Mode</span>
