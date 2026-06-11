@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
-import { Folder, ChevronRight, User, Menu } from 'lucide-react'
+import { Folder, ChevronRight, User, Menu, BarChart2 } from 'lucide-react'
 import ThemeToggle from '../ui/ThemeToggle'
 
 const BREADCRUMBS = {
@@ -10,7 +10,7 @@ const BREADCRUMBS = {
   '/dashboard/ui-to-code': ['src', 'pages', 'UIToCode.jsx'],
 }
 
-export default function Navbar({ onMenuClick }) {
+export default function Navbar({ onMenuClick, onInsightsToggle }) {
   const { pathname } = useLocation()
   const { user, logout } = useApp()
   
@@ -56,32 +56,18 @@ export default function Navbar({ onMenuClick }) {
 
       {/* 2. Global Actions Area */}
       <div className="flex items-center gap-4">
-        {/* API Server status ping */}
-        <div className="hidden lg:flex items-center gap-1.5 text-[10px] text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          COGNITION: ONLINE
-        </div>
-
-        {/* Search trigger helper */}
+        {/* Insights Toggle button */}
         <button
-          onClick={() => {
-            const e = new KeyboardEvent('keydown', {
-              key: 'k',
-              ctrlKey: true,
-              metaKey: true,
-              bubbles: true
-            })
-            window.dispatchEvent(e)
-          }}
-          className="hidden md:flex items-center gap-2 px-3 py-1 text-xs rounded border hover:border-zinc-500 transition-colors"
+          onClick={onInsightsToggle}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded border hover:border-zinc-500 transition-colors bg-transparent cursor-pointer"
           style={{
-            backgroundColor: 'var(--bg-base)',
             borderColor: 'var(--border)',
             color: 'var(--text-secondary)'
           }}
+          title="Toggle System Telemetry & Insights"
         >
-          <span>Quick Command</span>
-          <kbd className="px-1.5 py-0.5 rounded text-[10px] bg-zinc-800 border border-zinc-700 text-zinc-400">Ctrl K</kbd>
+          <BarChart2 className="w-3.5 h-3.5" />
+          <span>Insights</span>
         </button>
 
         {/* Theme toggle */}
