@@ -26,7 +26,12 @@
       "dest": "backend/main.py"
     },
     {
-      "handle": "filesystem"
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/favicon\\.svg",
+      "dest": "/favicon.svg"
     },
     {
       "src": "/(.*)",
