@@ -66,6 +66,7 @@ async def quick_chat(
     api_key = request.headers.get("X-API-Key") or None
     groq_api_key = request.headers.get("X-Groq-API-Key") or None
     openrouter_api_key = request.headers.get("X-OpenRouter-API-Key") or None
+    cerebras_api_key = request.headers.get("X-Cerebras-API-Key") or None
     preferred_provider = request.headers.get("X-Preferred-Provider") or "auto"
     
     prompt = f"""You are a helpful, enterprise-grade AI software development teammate built into the SkillSync AI Developer Operating System.
@@ -84,6 +85,7 @@ Assistant:"""
             api_key=api_key,
             groq_api_key=groq_api_key,
             openrouter_api_key=openrouter_api_key,
+            cerebras_api_key=cerebras_api_key,
             preferred_provider=preferred_provider,
         )
         return {"response": raw, "model": model_used}

@@ -50,7 +50,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
         style={{
-          background: 'var(--bg-surface)',
+          background: 'var(--bg-sidebar)',
           borderColor: 'var(--border)',
         }}
       >

@@ -14,6 +14,7 @@ async def analyze_error(
     api_key: Optional[str] = None,
     groq_api_key: Optional[str] = None,
     openrouter_api_key: Optional[str] = None,
+    cerebras_api_key: Optional[str] = None,
     preferred_provider: Optional[str] = "auto",
 ) -> dict:
     # OCR extraction from image
@@ -42,6 +43,7 @@ Respond with valid JSON only."""
             api_key=api_key,
             groq_api_key=groq_api_key,
             openrouter_api_key=openrouter_api_key,
+            cerebras_api_key=cerebras_api_key,
             preferred_provider=preferred_provider,
         )
 

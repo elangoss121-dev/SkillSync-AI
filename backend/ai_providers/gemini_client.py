@@ -12,7 +12,6 @@ MODELS = [
     "gemini-2.0-flash",
     "gemini-1.5-flash",
     "gemini-1.5-flash-8b",
-    "gemini-3.5-flash",
     "gemini-2.5-pro",
     "gemini-1.5-pro",
 ]
@@ -37,10 +36,16 @@ async def generate(
     api_key: Optional[str] = None,
     groq_api_key: Optional[str] = None,
     openrouter_api_key: Optional[str] = None,
+    cerebras_api_key: Optional[str] = None,
     preferred_provider: Optional[str] = "auto",
 ) -> Tuple[str, str]:
-    """Generate a response using a customizable chain of providers (Groq, OpenRouter, Gemini)."""
+    """Generate a response using a customizable chain of providers with automatic failover.
     
+    Priority chain (auto mode): Groq → OpenRouter → Cerebras → Gemini
+    Each provider is tried in sequence; on error, the next provider is attempted.
+    Authentication failures (401) are raised immediately to prevent infinite retries.
+    """
+
     async def try_groq():
         from ai_providers import groq_client
         effective_groq_key = groq_client.get_api_key(groq_api_key)
@@ -54,6 +59,13 @@ async def generate(
         if effective_or_key and effective_or_key != "your_openrouter_api_key_here":
             return await openrouter_client.generate(prompt, api_key=effective_or_key)
         raise ValueError("OpenRouter key not configured")
+
+    async def try_cerebras():
+        from ai_providers import cerebras_client
+        effective_cb_key = cerebras_client.get_api_key(cerebras_api_key)
+        if effective_cb_key and effective_cb_key != "your_cerebras_api_key_here":
+            return await cerebras_client.generate(prompt, api_key=effective_cb_key)
+        raise ValueError("Cerebras key not configured")
 
     async def try_gemini():
         client = get_client(api_key)
@@ -80,27 +92,29 @@ async def generate(
                 continue
         raise last_error or Exception("All Gemini models failed")
 
-    # If image data is present, we must use Gemini (vision support)
+    # If image data is present, we must use Gemini (only provider with vision support)
     if image_data:
         return await try_gemini()
 
-    # Determine execution priority chain
+    # Determine execution priority chain based on preferred_provider
     provider = (preferred_provider or "auto").lower().strip()
     if provider == "groq":
-        chain = [try_groq, try_openrouter, try_gemini]
+        chain = [try_groq, try_openrouter, try_cerebras, try_gemini]
     elif provider == "openrouter":
-        chain = [try_openrouter, try_groq, try_gemini]
+        chain = [try_openrouter, try_groq, try_cerebras, try_gemini]
+    elif provider == "cerebras":
+        chain = [try_cerebras, try_groq, try_openrouter, try_gemini]
     elif provider == "gemini":
-        chain = [try_gemini, try_groq, try_openrouter]
-    else:  # auto
-        chain = [try_groq, try_openrouter, try_gemini]
+        chain = [try_gemini, try_groq, try_openrouter, try_cerebras]
+    else:  # auto — fastest first, Gemini as final fallback
+        chain = [try_groq, try_openrouter, try_cerebras, try_gemini]
 
     last_error = None
     for attempt_func in chain:
         try:
             return await attempt_func()
         except Exception as e:
-            # Continue on failures unless it is an explicit auth error
+            # Stop immediately on authentication errors — do not waste retries
             err_str = str(e)
             if "API_KEY_INVALID" in err_str or "Authentication Failed" in err_str:
                 raise
@@ -108,8 +122,6 @@ async def generate(
             continue
 
     raise last_error or Exception("All AI providers failed to generate content")
-
-
 
 
 def is_available() -> bool:
