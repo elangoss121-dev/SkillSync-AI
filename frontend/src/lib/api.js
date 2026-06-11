@@ -9,31 +9,12 @@ const getBaseUrl = () => {
   return ''
 }
 
-const getApiKey = () => {
-  return localStorage.getItem('skillsync_api_key') || ''
-}
-
-const getGroqApiKey = () => {
-  return localStorage.getItem('skillsync_groq_api_key') || ''
-}
-
-const getOpenrouterApiKey = () => {
-  return localStorage.getItem('skillsync_openrouter_api_key') || ''
-}
-
 const createClient = () => {
   return axios.create({
     baseURL: getBaseUrl(),
-    headers: {
-      'X-API-Key': getApiKey(),
-      'X-Groq-API-Key': getGroqApiKey(),
-      'X-OpenRouter-API-Key': getOpenrouterApiKey(),
-    },
     timeout: 60000,
   })
 }
-
-
 
 /** Build a FormData from a plain object (skip undefined values) */
 function toForm(obj) {
@@ -69,4 +50,3 @@ export const api = {
 
   health: () => createClient().get('/api/health'),
 }
-

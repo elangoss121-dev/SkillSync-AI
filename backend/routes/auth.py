@@ -112,3 +112,68 @@ async def login(body: LoginRequest):
 @router.get("/me")
 async def me(current_user: dict = Depends(get_current_user)):
     return current_user
+
+
+class GoogleLoginRequest(BaseModel):
+    token: str
+
+
+@router.post("/google", response_model=AuthResponse)
+async def google_login(body: GoogleLoginRequest):
+    import httpx
+    import secrets
+
+    id_token = body.token
+    async with httpx.AsyncClient() as client:
+        try:
+            res = await client.get(
+                "https://oauth2.googleapis.com/tokeninfo",
+                params={"id_token": id_token},
+                timeout=10.0,
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Google authentication service unreachable: {str(e)}"
+            )
+
+        if res.status_code != 200:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid Google OAuth token"
+            )
+
+        payload = res.json()
+        
+        aud = payload.get("aud")
+        if aud != "206983008751-b0t50s6fedqijv24ig51jds4k64j708d.apps.googleusercontent.com":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Token audience mismatch"
+            )
+
+        email = payload.get("email")
+        name = payload.get("name", email.split("@")[0] if email else "Google User")
+        
+        if not email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email not provided by Google account"
+            )
+
+        row = get_user_by_email(email)
+        if row:
+            user = {k: v for k, v in row.items() if k != "password_hash"}
+        else:
+            # Create user dynamically
+            dummy_password = secrets.token_urlsafe(24)
+            user = create_user(name=name, email=email, password=dummy_password)
+            if not user:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Failed to create user account"
+                )
+
+        token = _make_token(user["id"])
+        update_last_login(user["id"])
+        return {"token": token, "user": user}

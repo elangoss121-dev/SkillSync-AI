@@ -8,7 +8,6 @@ import ErrorExplainer from './pages/dashboard/ErrorExplainer'
 import DocsGenerator from './pages/dashboard/DocsGenerator'
 import CodeSimplifier from './pages/dashboard/CodeSimplifier'
 import UIToCode from './pages/dashboard/UIToCode'
-import Settings from './pages/dashboard/Settings'
 
 // ── Auth guard: redirect to /login if no token stored ──────────────────────────
 function RequireAuth({ children }) {
@@ -36,7 +35,6 @@ export default function App() {
             <Route path="docs-generator"  element={<DocsGenerator />} />
             <Route path="code-simplifier" element={<CodeSimplifier />} />
             <Route path="ui-to-code"      element={<UIToCode />} />
-            <Route path="settings"        element={<Settings />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

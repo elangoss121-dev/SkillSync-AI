@@ -3,19 +3,6 @@ import { createContext, useContext, useState, useCallback, useEffect } from 'rea
 const AppContext = createContext(null)
 
 export function AppProvider({ children }) {
-  const [demoMode, setDemoMode] = useState(true)
-  const [apiKey, setApiKey] = useState(() => {
-    return localStorage.getItem('skillsync_api_key') || ''
-  })
-  const [groqApiKey, setGroqApiKey] = useState(() => {
-    return localStorage.getItem('skillsync_groq_api_key') || ''
-  })
-  const [openrouterApiKey, setOpenrouterApiKey] = useState(() => {
-    return localStorage.getItem('skillsync_openrouter_api_key') || ''
-  })
-  const [backendUrl, setBackendUrl] = useState(() => {
-    return localStorage.getItem('skillsync_backend_url') || import.meta.env.VITE_API_URL || ''
-  })
   const [toasts, setToasts] = useState([])
 
   // ── current user (loaded from localStorage on mount) ──────────────────────
@@ -39,12 +26,34 @@ export function AppProvider({ children }) {
     window.location.href = '/login'
   }, [])
 
-  // Theme: 'dark' | 'light' — persisted in localStorage
+  // Theme: automatic detection based on system preference
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('skillsync_theme') || 'dark'
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    }
+    return 'dark' // Default fallback
   })
 
-  // Apply/remove 'dark' class on <html> whenever theme changes
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    
+    const handleChange = (e) => {
+      setTheme(e.matches ? 'dark' : 'light')
+    }
+
+    // Initialize theme
+    setTheme(mediaQuery.matches ? 'dark' : 'light')
+
+    // Listen for changes
+    mediaQuery.addEventListener('change', handleChange)
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange)
+    }
+  }, [])
+
+  // Apply 'dark' class on <html> whenever theme changes
   useEffect(() => {
     const root = document.documentElement
     if (theme === 'dark') {
@@ -52,12 +61,7 @@ export function AppProvider({ children }) {
     } else {
       root.classList.remove('dark')
     }
-    localStorage.setItem('skillsync_theme', theme)
   }, [theme])
-
-  const toggleTheme = useCallback(() => {
-    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'))
-  }, [])
 
   const addToast = useCallback((message, type = 'info', duration = 4000) => {
     const id = Date.now() + Math.random()
@@ -71,30 +75,16 @@ export function AppProvider({ children }) {
     setToasts(prev => prev.filter(t => t.id !== id))
   }, [])
 
-  const toggleDemoMode = useCallback(() => {
-    setDemoMode(prev => {
-      const next = !prev
-      addToast(next ? 'Demo mode enabled — using mock responses' : 'Demo mode disabled — using live API', next ? 'info' : 'success')
-      return next
-    })
-  }, [addToast])
-
   return (
     <AppContext.Provider value={{
-      demoMode, toggleDemoMode,
-      apiKey, setApiKey,
-      groqApiKey, setGroqApiKey,
-      openrouterApiKey, setOpenrouterApiKey,
-      backendUrl, setBackendUrl,
       toasts, addToast, removeToast,
-      theme, toggleTheme,
+      theme,
       user, login, logout,
     }}>
       {children}
     </AppContext.Provider>
   )
 }
-
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function useApp() {

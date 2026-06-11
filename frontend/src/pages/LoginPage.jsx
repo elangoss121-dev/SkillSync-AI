@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Eye, EyeOff, Mail, Lock, User, Zap, ArrowRight, Check, Sparkles } from 'lucide-react'
 import axios from 'axios'
+import { useApp } from '../context/AppContext'
 
 // Relative URL in production = same Vercel domain handles /api/* via serverless
 // For local dev: create frontend/.env.local with VITE_API_URL=http://localhost:8000
@@ -46,6 +47,8 @@ function FloatingOrb({ style }) {
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const { theme } = useApp()
+  const isDark = theme === 'dark'
   const [tab, setTab]               = useState('login')   // 'login' | 'signup'
   const [name, setName]             = useState('')
   const [email, setEmail]           = useState('')
@@ -56,6 +59,47 @@ export default function LoginPage() {
   const [success, setSuccess]       = useState('')
 
   const strength = tab === 'signup' ? getPasswordStrength(password) : null
+
+  const handleGoogleLogin = async (response) => {
+    setError('')
+    setSuccess('')
+    setLoading(true)
+
+    try {
+      const { data } = await axios.post(`${API_BASE}/api/auth/google`, {
+        token: response.credential,
+      })
+      localStorage.setItem('skillsync_token', data.token)
+      localStorage.setItem('skillsync_user', JSON.stringify(data.user))
+      setSuccess(`Welcome, ${data.user.name}! Redirecting…`)
+      setTimeout(() => navigate('/dashboard'), 1200)
+    } catch (err) {
+      const msg = err?.response?.data?.detail || 'Google login failed. Please try again.'
+      setError(msg)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    /* global google */
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: "206983008751-b0t50s6fedqijv24ig51jds4k64j708d.apps.googleusercontent.com",
+        callback: handleGoogleLogin,
+      })
+      window.google.accounts.id.renderButton(
+        document.getElementById("google-signin-btn"),
+        { 
+          theme: isDark ? "filled_black" : "outline", 
+          size: "large", 
+          width: 382, 
+          text: "signin_with", 
+          shape: "rectangular" 
+        }
+      )
+    }
+  }, [tab, theme, isDark])
 
   // Check if already logged in
   useEffect(() => {
@@ -313,6 +357,18 @@ export default function LoginPage() {
               </span>
             </motion.button>
           </form>
+
+          {/* divider */}
+          <div className="flex items-center my-5 text-zinc-500 text-xs font-semibold relative z-10">
+            <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800" />
+            <span className="px-3 uppercase tracking-wider text-[10px] text-zinc-400">Or continue with</span>
+            <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800" />
+          </div>
+
+          {/* Google Sign-in Button Container */}
+          <div className="flex justify-center relative z-10" id="google-signin-btn-wrapper">
+            <div id="google-signin-btn" style={{ minWidth: '382px' }} />
+          </div>
 
           {/* footer */}
           <p className="text-center text-xs mt-6 relative z-10" style={{ color: 'var(--text-muted)' }}>

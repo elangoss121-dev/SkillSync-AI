@@ -13,20 +13,19 @@ export default function UIToCode() {
   const [file, setFile] = useState(null)
   const [description, setDescription] = useState('')
   const [previewTab, setPreviewTab] = useState('code')
-  const [provider, setProvider] = useState('auto')
   const { run, loading, result, reset } = useAI('uiToCode')
   const { addToast } = useApp()
 
   const handleSubmit = () => {
     if (!file && !description && !result) {
       // In demo mode, run with empty payload
-      run({}, provider)
+      run({})
       return
     }
     const formData = new FormData()
     if (file) formData.append('image', file)
     if (description) formData.append('description', description)
-    run(formData, provider)
+    run(formData)
   }
 
   const d = result?.data
@@ -94,20 +93,7 @@ export default function UIToCode() {
             </motion.div>
           )}
 
-          {/* Provider Selector */}
-          <div className="flex items-center gap-2 glass rounded-lg p-2.5 text-xs">
-            <span className="text-zinc-500 font-medium px-1">AI Provider:</span>
-            <select
-              value={provider}
-              onChange={e => setProvider(e.target.value)}
-              className="bg-transparent text-zinc-300 font-semibold border-none focus:outline-none cursor-pointer pr-4 flex-1"
-            >
-              <option value="auto" className="bg-zinc-950 text-zinc-300 font-medium">Auto (Fallback)</option>
-              <option value="groq" className="bg-zinc-950 text-zinc-300 font-medium">Groq (Fast)</option>
-              <option value="openrouter" className="bg-zinc-950 text-zinc-300 font-medium">OpenRouter (Versatile)</option>
-              <option value="gemini" className="bg-zinc-950 text-zinc-300 font-medium">Gemini (Native)</option>
-            </select>
-          </div>
+
 
           <div className="flex gap-3">
             <button

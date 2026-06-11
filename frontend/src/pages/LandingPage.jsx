@@ -7,7 +7,6 @@ import {
 } from 'lucide-react'
 import AnimatedCodeBg from '../components/ui/AnimatedCodeBg'
 import { useApp } from '../context/AppContext'
-import ThemeToggle from '../components/ui/ThemeToggle'
 
 const FEATURES = [
   {
@@ -69,10 +68,7 @@ export default function LandingPage() {
       className="min-h-screen overflow-x-hidden transition-colors duration-300 relative"
       style={{ background: 'var(--bg-base)', color: 'var(--text-primary)' }}
     >
-      {/* ─── TOP NAV BAR (landing) ─── */}
-      <div className="fixed top-0 right-0 z-50 p-4">
-        <ThemeToggle />
-      </div>
+
 
       {/* ─── HERO ─── */}
       <section className="relative min-h-screen flex items-center justify-center px-4 py-20">

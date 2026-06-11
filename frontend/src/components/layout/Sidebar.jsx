@@ -1,8 +1,8 @@
 import { NavLink } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Bug, FileText, Code2, Image, Settings,
-  Cpu, ChevronLeft, ChevronRight, Zap, LogOut, User,
+  Bug, FileText, Code2, Image,
+  Cpu, ChevronLeft, ChevronRight, LogOut, User,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
@@ -12,12 +12,11 @@ const NAV_ITEMS = [
   { to: '/dashboard/docs-generator',  icon: FileText, label: 'Docs Generator',   color: 'text-blue-400' },
   { to: '/dashboard/code-simplifier', icon: Code2,    label: 'Code Simplifier',  color: 'text-purple-400' },
   { to: '/dashboard/ui-to-code',      icon: Image,    label: 'UI to Code',       color: 'text-cyan-400' },
-  { to: '/dashboard/settings',        icon: Settings, label: 'Settings',         color: 'text-zinc-400' },
 ]
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
-  const { demoMode, user, logout } = useApp()
+  const { user, logout } = useApp()
 
   return (
     <motion.aside
@@ -47,21 +46,6 @@ export default function Sidebar() {
           )}
         </AnimatePresence>
       </div>
-
-      {/* Demo badge */}
-      <AnimatePresence>
-        {demoMode && !collapsed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="mx-3 mb-4 px-2.5 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center gap-1.5"
-          >
-            <Zap className="w-3 h-3 text-indigo-400 flex-shrink-0" />
-            <span className="text-[11px] font-medium text-indigo-400 dark:text-indigo-300">Demo Mode</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Navigation */}
       <nav className="flex-1 px-2 space-y-0.5">

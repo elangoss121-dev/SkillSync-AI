@@ -37,12 +37,11 @@ export default function CodeSimplifier() {
   const [code, setCode] = useState(MOCK_SAMPLE_CODE)
   const [language, setLanguage] = useState('python')
   const [beginnerMode, setBeginnerMode] = useState(false)
-  const [provider, setProvider] = useState('auto')
   const { run, loading, result, reset } = useAI('simplifyCode')
   const { addToast } = useApp()
 
   const handleSubmit = () => {
-    run({ code, language, beginner_mode: beginnerMode }, provider)
+    run({ code, language, beginner_mode: beginnerMode })
   }
 
   const d = result?.data
@@ -97,20 +96,7 @@ export default function CodeSimplifier() {
           Explain Like Beginner
         </button>
 
-        {/* Provider selector */}
-        <div className="flex items-center gap-2 glass rounded-lg p-1.5 text-xs">
-          <span className="text-zinc-500 font-medium px-2">AI Provider:</span>
-          <select
-            value={provider}
-            onChange={e => setProvider(e.target.value)}
-            className="bg-transparent text-zinc-300 font-semibold border-none focus:outline-none cursor-pointer pr-4"
-          >
-            <option value="auto" className="bg-zinc-950 text-zinc-300 font-medium">Auto (Fallback)</option>
-            <option value="groq" className="bg-zinc-950 text-zinc-300 font-medium">Groq (Fast)</option>
-            <option value="openrouter" className="bg-zinc-950 text-zinc-300 font-medium">OpenRouter (Versatile)</option>
-            <option value="gemini" className="bg-zinc-950 text-zinc-300 font-medium">Gemini (Native)</option>
-          </select>
-        </div>
+
       </div>
 
       <div className="grid lg:grid-cols-2 gap-5">

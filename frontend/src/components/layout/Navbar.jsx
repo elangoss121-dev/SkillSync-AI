@@ -1,23 +1,18 @@
 import { useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { motion } from 'framer-motion'
-import { CheckCircle, XCircle, User, Zap } from 'lucide-react'
-import ThemeToggle from '../ui/ThemeToggle'
+import { User } from 'lucide-react'
 
 const PAGE_NAMES = {
   '/dashboard/error-explainer': 'AI Error Explainer',
   '/dashboard/docs-generator': 'Documentation Generator',
   '/dashboard/code-simplifier': 'Code Simplifier',
   '/dashboard/ui-to-code': 'UI to Code',
-  '/dashboard/settings': 'Settings',
 }
 
 export default function Navbar() {
   const { pathname } = useLocation()
-  const { apiKey, demoMode, toggleDemoMode, theme, toggleTheme } = useApp()
   const pageName = PAGE_NAMES[pathname] || 'Dashboard'
-  const hasKey = demoMode || Boolean(apiKey)
-  const isDark = theme === 'dark'
 
   return (
     <header
@@ -36,36 +31,6 @@ export default function Navbar() {
       </motion.h1>
 
       <div className="flex items-center gap-3">
-        {/* Theme toggle */}
-        <ThemeToggle />
-
-        {/* Demo mode toggle */}
-        <button
-          id="demo-mode-toggle-btn"
-          onClick={toggleDemoMode}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-300
-            ${demoMode
-              ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400 dark:text-indigo-300 hover:bg-indigo-500/20'
-              : 'border-[var(--border-solid)] text-[var(--text-muted)] hover:border-[var(--text-placeholder)]'
-            }`}
-        >
-          <Zap className="w-3 h-3" />
-          Demo {demoMode ? 'ON' : 'OFF'}
-        </button>
-
-        {/* API key status */}
-        <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border
-          ${hasKey
-            ? 'border-green-500/20 bg-green-500/5 text-green-500 dark:text-green-400'
-            : 'border-red-500/20 bg-red-500/5 text-red-500 dark:text-red-400'
-          }`}>
-          {hasKey
-            ? <CheckCircle className="w-3 h-3" />
-            : <XCircle className="w-3 h-3" />
-          }
-          {hasKey ? (demoMode ? 'Demo' : 'API Connected') : 'No API Key'}
-        </div>
-
         {/* Avatar */}
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center cursor-pointer hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-shadow">
           <User className="w-4 h-4 text-white" />

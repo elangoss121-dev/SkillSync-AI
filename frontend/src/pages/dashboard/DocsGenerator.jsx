@@ -49,7 +49,6 @@ export default function DocsGenerator() {
   const [file, setFile] = useState(null)
   const [pastedCode, setPastedCode] = useState('')
   const [activeTab, setActiveTab] = useState('readme')
-  const [provider, setProvider] = useState('auto')
   const { run, loading, result, reset } = useAI('generateDocs')
   const { addToast } = useApp()
 
@@ -58,7 +57,7 @@ export default function DocsGenerator() {
       github_url: githubUrl || (file || pastedCode ? undefined : MOCK_SAMPLE_GITHUB_URL),
       source_code: pastedCode,
       file: file || undefined,
-    }, provider)
+    })
   }
 
   const d = result?.data
@@ -137,21 +136,6 @@ export default function DocsGenerator() {
               value={pastedCode}
               onChange={e => setPastedCode(e.target.value)}
             />
-          </div>
-
-          {/* Provider Selector */}
-          <div className="flex items-center gap-2 glass rounded-lg p-2.5 text-xs">
-            <span className="text-zinc-500 font-medium px-1">AI Provider:</span>
-            <select
-              value={provider}
-              onChange={e => setProvider(e.target.value)}
-              className="bg-transparent text-zinc-300 font-semibold border-none focus:outline-none cursor-pointer pr-4 flex-1"
-            >
-              <option value="auto" className="bg-zinc-950 text-zinc-300 font-medium">Auto (Fallback)</option>
-              <option value="groq" className="bg-zinc-950 text-zinc-300 font-medium">Groq (Fast)</option>
-              <option value="openrouter" className="bg-zinc-950 text-zinc-300 font-medium">OpenRouter (Versatile)</option>
-              <option value="gemini" className="bg-zinc-950 text-zinc-300 font-medium">Gemini (Native)</option>
-            </select>
           </div>
 
           <button
