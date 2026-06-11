@@ -16,8 +16,8 @@ function getPasswordStrength(password) {
   if (/[0-9]/.test(password)) score++
   if (/[^A-Za-z0-9]/.test(password)) score++
   if (score <= 1) return { label: 'Weak',   color: '#ef4444', pct: 20  }
-  if (score <= 2) return { label: 'Fair',   color: '#FF6B35', pct: 40  }
-  if (score <= 3) return { label: 'Good',   color: '#FF8C5A', pct: 60  }
+  if (score <= 2) return { label: 'Fair',   color: 'var(--accent-primary)', pct: 40  }
+  if (score <= 3) return { label: 'Good',   color: 'var(--accent-primary)', pct: 60  }
   if (score <= 4) return { label: 'Strong', color: '#10b981', pct: 80  }
   return              { label: 'Great!',  color: '#059669', pct: 100 }
 }
@@ -49,7 +49,7 @@ export default function LoginPage() {
       localStorage.setItem('skillsync_token', data.token)
       localStorage.setItem('skillsync_user', JSON.stringify(data.user))
       setSuccess(`Welcome, ${data.user.name}! Redirecting…`)
-      setTimeout(() => navigate('/dashboard'), 1200)
+      setTimeout(() => navigate('/dashboard/error-explainer'), 1200)
     } catch (err) {
       const msg = err?.response?.data?.detail || 'Google login failed. Please try again.'
       setError(msg)
@@ -126,17 +126,17 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4 font-mono"
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4 font-mono transition-colors duration-300"
          style={{ background: 'var(--bg-base)' }}>
 
       {/* Grid lines background */}
       <div className="absolute inset-0 bg-grid opacity-20 pointer-events-none" />
 
-      {/* Subtle Electric Orange center glow */}
+      {/* Subtle center glow */}
       <div 
         className="absolute w-[500px] h-[300px] rounded-full blur-[140px] pointer-events-none opacity-20"
         style={{ 
-          background: 'radial-gradient(circle, rgba(255, 107, 53, 0.15) 0%, transparent 80%)',
+          background: 'radial-gradient(circle, var(--accent-primary-glow) 0%, transparent 80%)',
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)'
@@ -149,35 +149,35 @@ export default function LoginPage() {
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className="relative z-10 w-full max-w-md"
       >
-        {/* Graphite credentials card */}
-        <div className="rounded-lg p-8 shadow-2xl border bg-[#151515]"
-             style={{ borderColor: 'var(--border-solid)' }}>
+        {/* Credentials card */}
+        <div className="rounded-lg p-8 shadow-2xl border"
+             style={{ borderColor: 'var(--border-solid)', backgroundColor: 'var(--bg-surface)' }}>
 
           {/* Logo header */}
           <div className="text-center mb-8 select-none">
             <div 
-              className="inline-flex items-center justify-center w-12 h-12 rounded border mb-4 bg-[#0A0A0A]"
-              style={{ borderColor: '#FF6B35' }}
+              className="inline-flex items-center justify-center w-12 h-12 rounded border mb-4"
+              style={{ borderColor: 'var(--accent-primary)', backgroundColor: 'var(--bg-base)' }}
             >
-              <Cpu size={20} className="text-[#FF6B35]" />
+              <Cpu size={20} style={{ color: 'var(--accent-primary)' }} />
             </div>
-            <h1 className="text-xl font-bold text-white tracking-tight">skillsync.ai</h1>
+            <h1 className="text-xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>skillsync.ai</h1>
             <p className="text-xs mt-1.5 text-zinc-400">
               {tab === 'login' ? 'SIGN_IN_SESSION' : 'PROVISION_USER_ACCOUNT'}
             </p>
           </div>
 
           {/* Tab Switcher */}
-          <div className="flex rounded p-1 mb-6 border bg-[#0A0A0A]"
-               style={{ borderColor: 'var(--border)' }}>
+          <div className="flex rounded p-1 mb-6 border"
+               style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-base)' }}>
             {['login', 'signup'].map((t) => (
               <button
                 key={t}
                 onClick={() => switchTab(t)}
-                className="flex-1 py-1.5 text-xs font-semibold rounded transition-colors duration-200 select-none outline-none focus:outline-none"
+                className="flex-1 py-1.5 text-xs font-semibold rounded transition-colors duration-200 select-none outline-none focus:outline-none cursor-pointer"
                 style={{
-                  background: tab === t ? '#FF6B35' : 'transparent',
-                  color:      tab === t ? '#0A0A0A' : 'var(--text-secondary)',
+                  background: tab === t ? 'var(--accent-primary)' : 'transparent',
+                  color:      tab === t ? 'var(--theme-toggle-active-text)' : 'var(--text-secondary)',
                 }}
               >
                 {t === 'login' ? 'Sign In' : 'Register'}
@@ -199,15 +199,15 @@ export default function LoginPage() {
                 >
                   <label className="block text-[10px] font-bold mb-1.5 uppercase tracking-wider text-zinc-500">Full Name</label>
                   <div className="relative">
-                    <User size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500" />
+                    <User className="absolute left-3 top-3.5 w-4 h-4 text-zinc-500" />
                     <input
-                      id="auth-name"
+                      required
                       type="text"
+                      className="w-full text-xs pl-10 pr-4 py-3 border rounded focus:outline-none transition-all font-mono"
+                      style={{ backgroundColor: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--text-primary)' }}
+                      placeholder="Identify as Name..."
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Username"
-                      required={tab === 'signup'}
-                      className="input-dark pl-10 text-xs"
+                      onChange={e => setName(e.target.value)}
                     />
                   </div>
                 </motion.div>
@@ -217,46 +217,46 @@ export default function LoginPage() {
             <div>
               <label className="block text-[10px] font-bold mb-1.5 uppercase tracking-wider text-zinc-500">Email Address</label>
               <div className="relative">
-                <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500" />
+                <Mail className="absolute left-3 top-3.5 w-4 h-4 text-zinc-500" />
                 <input
-                  id="auth-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@domain.com"
                   required
-                  className="input-dark pl-10 text-xs"
+                  type="email"
+                  className="w-full text-xs pl-10 pr-4 py-3 border rounded focus:outline-none transition-all font-mono"
+                  style={{ backgroundColor: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--text-primary)' }}
+                  placeholder="name@domain.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[10px] font-bold mb-1.5 uppercase tracking-wider text-zinc-500">Password</label>
+              <label className="block text-[10px] font-bold mb-1.5 uppercase tracking-wider text-zinc-500">Password Key</label>
               <div className="relative">
-                <Lock size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500" />
+                <Lock className="absolute left-3 top-3.5 w-4 h-4 text-zinc-500" />
                 <input
-                  id="auth-password"
-                  type={showPass ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={tab === 'signup' ? 'Min 6 characters' : 'Enter secret'}
                   required
-                  className="input-dark pl-10 pr-10 text-xs"
+                  type={showPass ? 'text' : 'password'}
+                  className="w-full text-xs pl-10 pr-10 py-3 border rounded focus:outline-none transition-all font-mono"
+                  style={{ backgroundColor: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--text-primary)' }}
+                  placeholder="••••••••••••"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-350 outline-none focus:outline-none"
+                  className="absolute right-3 top-3.5 text-zinc-550 hover:text-zinc-300 transition-colors border-0 bg-transparent focus:outline-none cursor-pointer"
                 >
-                  {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
 
-              {/* Password strength */}
+              {/* Password strength indicator */}
               <AnimatePresence>
-                {tab === 'signup' && password.length > 0 && (
+                {strength && (
                   <motion.div
-                    initial={{ opacity: 0, y: -4 }}
+                    initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                     className="mt-2"
@@ -265,7 +265,7 @@ export default function LoginPage() {
                       <span className="text-zinc-500">Security Check:</span>
                       <span className="font-bold" style={{ color: strength.color }}>{strength.label}</span>
                     </div>
-                    <div className="h-1 rounded-full overflow-hidden bg-[#0A0A0A]">
+                    <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--bg-base)' }}>
                       <motion.div
                         className="h-full rounded-full"
                         animate={{ width: `${strength.pct}%` }}
@@ -278,23 +278,29 @@ export default function LoginPage() {
               </AnimatePresence>
             </div>
 
-            {/* Error / Success messages */}
+            {/* Error message */}
             <AnimatePresence>
               {error && (
                 <motion.div
-                  initial={{ opacity: 0, y: -8 }}
+                  initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded px-4 py-2.5 text-xs font-semibold border"
+                  exit={{ opacity: 0 }}
+                  className="p-3.5 rounded border text-[11px] font-semibold leading-relaxed flex items-center gap-2"
                   style={{ background: 'rgba(239,68,68,0.08)', color: '#f87171', borderColor: 'rgba(239,68,68,0.15)' }}
                 >
-                  {error}
+                  <span>⚠️</span> {error}
                 </motion.div>
               )}
+            </AnimatePresence>
+
+            {/* Success message */}
+            <AnimatePresence>
               {success && (
                 <motion.div
-                  initial={{ opacity: 0, y: -8 }}
+                  initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded px-4 py-2.5 text-xs font-semibold border flex items-center gap-2"
+                  exit={{ opacity: 0 }}
+                  className="p-3.5 rounded border text-[11px] font-semibold leading-relaxed flex items-center gap-2"
                   style={{ background: 'rgba(34,197,94,0.08)', color: '#4ade80', borderColor: 'rgba(34,197,94,0.15)' }}
                 >
                   <Check size={14} /> {success}
@@ -307,11 +313,11 @@ export default function LoginPage() {
               id="auth-submit"
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded text-xs font-bold btn-primary text-[#0A0A0A] disabled:opacity-50"
+              className="w-full text-xs font-bold btn-primary disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin text-black" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
                   </svg>
                   Initializing Engine...
@@ -327,10 +333,10 @@ export default function LoginPage() {
           </form>
 
           {/* Divider */}
-          <div className="flex items-center my-5 text-zinc-650 text-xs font-semibold">
-            <div className="flex-1 h-px bg-zinc-900" />
+          <div className="flex items-center my-5 text-zinc-650 text-xs font-semibold select-none">
+            <div className="flex-1 h-px" style={{ backgroundColor: 'var(--border)' }} />
             <span className="px-3 uppercase tracking-wider text-[9px] text-zinc-550">Or authenticate with</span>
-            <div className="flex-1 h-px bg-zinc-900" />
+            <div className="flex-1 h-px" style={{ backgroundColor: 'var(--border)' }} />
           </div>
 
           {/* Google Sign-in */}
@@ -339,13 +345,14 @@ export default function LoginPage() {
           </div>
 
           {/* Footer toggle */}
-          <p className="text-center text-[10px] mt-6 text-zinc-500">
+          <p className="text-center text-[10px] mt-6 text-zinc-500 select-none">
             {tab === 'login'
               ? "First time connecting? "
               : 'Already configured? '}
             <button
               onClick={() => switchTab(tab === 'login' ? 'signup' : 'login')}
-              className="font-bold underline underline-offset-2 text-[#FF6B35] hover:text-[#FF804F]"
+              className="font-bold underline underline-offset-2 hover:opacity-80 cursor-pointer border-0 bg-transparent"
+              style={{ color: 'var(--accent-primary)' }}
             >
               {tab === 'login' ? 'Register Account' : 'Back to Login'}
             </button>
@@ -353,7 +360,7 @@ export default function LoginPage() {
         </div>
 
         {/* Bottom security line */}
-        <p className="text-center text-[10px] mt-4 text-zinc-600">
+        <p className="text-center text-[10px] mt-4 text-zinc-600 select-none">
           🔒 Secure Transport Encryption (bcrypt active)
         </p>
       </motion.div>

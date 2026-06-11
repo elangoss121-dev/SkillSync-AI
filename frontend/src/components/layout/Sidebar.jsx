@@ -60,14 +60,12 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
             <div 
               className="w-8 h-8 rounded border flex items-center justify-center flex-shrink-0 transition-all duration-300"
               style={{
-                backgroundColor: isDark ? '#0A0A0A' : '#6366F1',
-                borderColor: isDark ? '#FF6B35' : '#6366F1',
-                boxShadow: isDark 
-                  ? '0 0 10px rgba(255, 107, 53, 0.15)' 
-                  : '0 4px 10px rgba(99, 102, 241, 0.2)'
+                backgroundColor: isDark ? 'var(--bg-base)' : 'var(--accent-primary)',
+                borderColor: 'var(--accent-primary)',
+                boxShadow: '0 2px 8px var(--accent-primary-glow)'
               }}
             >
-              <Cpu className={`w-4 h-4 ${isDark ? 'text-[#FF6B35]' : 'text-white'}`} />
+              <Cpu className="w-4 h-4 transition-colors" style={{ color: isDark ? 'var(--accent-primary)' : '#FFFFFF' }} />
             </div>
             <AnimatePresence>
               {!collapsed && (
@@ -79,7 +77,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
                 >
                   <span 
                     className="text-sm font-bold tracking-tight whitespace-nowrap"
-                    style={{ color: isDark ? '#FF6B35' : 'var(--text-primary)' }}
+                    style={{ color: 'var(--accent-primary)' }}
                   >
                     SkillSync AI
                   </span>

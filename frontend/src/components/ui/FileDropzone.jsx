@@ -38,8 +38,8 @@ export default function FileDropzone({
           animate={{ opacity: 1, scale: 1 }}
           className="relative rounded-lg border p-4 transition-all duration-300"
           style={{
-            backgroundColor: isDark ? 'rgba(255, 107, 53, 0.03)' : 'rgba(99, 102, 241, 0.03)',
-            borderColor: isDark ? '#FF6B35' : '#6366F1'
+            backgroundColor: 'var(--accent-primary-glow)',
+            borderColor: 'var(--accent-primary)'
           }}
         >
           <button
@@ -70,8 +70,8 @@ export default function FileDropzone({
             </div>
           ) : (
             <div className="flex items-center gap-3 font-mono">
-              <div className="flex-shrink-0 w-10 h-10 rounded bg-[#FF6B35]/10 dark:bg-zinc-850 border border-[#FF6B35]/20 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-[#FF6B35]" />
+              <div className="flex-shrink-0 w-10 h-10 rounded border flex items-center justify-center" style={{ backgroundColor: 'var(--accent-primary-glow)', borderColor: 'var(--accent-primary-glow)' }}>
+                <FileText className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
               </div>
               <div>
                 <p className="text-xs font-bold text-[var(--text-primary)]">{file.name}</p>
@@ -86,12 +86,8 @@ export default function FileDropzone({
           id={id}
           className={`rounded-lg border-2 border-dashed transition-all duration-300 cursor-pointer p-8 text-center`}
           style={{
-            backgroundColor: isDragActive 
-              ? (isDark ? 'rgba(255, 107, 53, 0.04)' : 'rgba(99, 102, 241, 0.04)') 
-              : 'transparent',
-            borderColor: isDragActive
-              ? (isDark ? '#FF6B35' : '#6366F1')
-              : 'var(--border-solid)',
+            backgroundColor: isDragActive ? 'var(--accent-primary-glow)' : 'transparent',
+            borderColor: isDragActive ? 'var(--accent-primary)' : 'var(--border-solid)',
           }}
         >
           <input {...getInputProps()} />

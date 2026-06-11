@@ -114,7 +114,7 @@ export default function DashboardLayout() {
                         className="h-full rounded-full transition-all duration-300"
                         style={{ 
                           width: `${t.percent}%`,
-                          background: isDark ? '#FF6B35' : 'linear-gradient(90deg, #6366F1 0%, #8B5CF6 100%)'
+                          background: 'var(--accent-gradient)'
                         }}
                       />
                     </div>
@@ -132,7 +132,7 @@ export default function DashboardLayout() {
                   </div>
                   <div className="p-2.5 flex justify-between items-center">
                     <span className="text-zinc-500">PROVIDER</span>
-                    <span className="text-[#FF6B35] dark:text-[#FF6B35] font-bold" style={{ color: 'var(--accent-primary)' }}>GEMINI CORE</span>
+                    <span className="font-bold" style={{ color: 'var(--accent-primary)' }}>GEMINI CORE</span>
                   </div>
                   <div className="p-2.5 flex justify-between items-center">
                     <span className="text-zinc-500">SANDBOX</span>

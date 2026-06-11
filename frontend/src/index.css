@@ -37,6 +37,7 @@
   --accent-purple:    #FF6B35;
   --accent-cyan:      #FFA07A;
   --accent-primary-glow: rgba(255, 107, 53, 0.12);
+  --accent-gradient:  #FF6B35;
 
   /* Sidebar active navigation variables */
   --sidebar-active-bg: rgba(255, 107, 53, 0.08);
@@ -80,6 +81,7 @@
   --accent-purple:    #8B5CF6; /* Purple */
   --accent-cyan:      #06B6D4;
   --accent-primary-glow: rgba(99, 102, 241, 0.1);
+  --accent-gradient:  linear-gradient(90deg, #6366F1 0%, #8B5CF6 100%);
 
   /* Sidebar active navigation variables */
   --sidebar-active-bg: rgba(99, 102, 241, 0.08);

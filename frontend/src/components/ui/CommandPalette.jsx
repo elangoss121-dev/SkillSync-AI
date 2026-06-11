@@ -202,18 +202,14 @@ export default function CommandPalette({ isOpen, setIsOpen }) {
                     setIsOpen(false)
                   }}
                   onMouseEnter={() => setSelectedIndex(index)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded text-left transition-colors ${
-                    isSelected 
-                      ? 'bg-zinc-800 text-white' 
-                      : 'text-zinc-300 hover:bg-zinc-900/50'
-                  }`}
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded text-left transition-colors"
                   style={{
-                    backgroundColor: isSelected ? 'rgba(255, 107, 53, 0.08)' : 'transparent',
+                    backgroundColor: isSelected ? 'var(--accent-primary-glow)' : 'transparent',
                     color: isSelected ? 'var(--accent-primary)' : 'var(--text-secondary)'
                   }}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 ${isSelected ? 'text-[#FF6B35]' : 'text-zinc-500'}`} />
+                    <Icon className="w-4 h-4 transition-colors" style={{ color: isSelected ? 'var(--accent-primary)' : 'var(--text-muted)' }} />
                     <span className="text-xs font-mono">{opt.name}</span>
                   </div>
                   {isSelected && (
