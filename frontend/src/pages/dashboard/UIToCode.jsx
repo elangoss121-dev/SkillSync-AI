@@ -13,19 +13,20 @@ export default function UIToCode() {
   const [file, setFile] = useState(null)
   const [description, setDescription] = useState('')
   const [previewTab, setPreviewTab] = useState('code')
+  const [provider, setProvider] = useState('auto')
   const { run, loading, result, reset } = useAI('uiToCode')
   const { addToast } = useApp()
 
   const handleSubmit = () => {
     if (!file && !description && !result) {
       // In demo mode, run with empty payload
-      run({})
+      run({}, provider)
       return
     }
     const formData = new FormData()
     if (file) formData.append('image', file)
     if (description) formData.append('description', description)
-    run(formData)
+    run(formData, provider)
   }
 
   const d = result?.data
@@ -93,6 +94,21 @@ export default function UIToCode() {
             </motion.div>
           )}
 
+          {/* Provider Selector */}
+          <div className="flex items-center gap-2 glass rounded-lg p-2.5 text-xs">
+            <span className="text-zinc-500 font-medium px-1">AI Provider:</span>
+            <select
+              value={provider}
+              onChange={e => setProvider(e.target.value)}
+              className="bg-transparent text-zinc-300 font-semibold border-none focus:outline-none cursor-pointer pr-4 flex-1"
+            >
+              <option value="auto" className="bg-zinc-950 text-zinc-300 font-medium">Auto (Fallback)</option>
+              <option value="groq" className="bg-zinc-950 text-zinc-300 font-medium">Groq (Fast)</option>
+              <option value="openrouter" className="bg-zinc-950 text-zinc-300 font-medium">OpenRouter (Versatile)</option>
+              <option value="gemini" className="bg-zinc-950 text-zinc-300 font-medium">Gemini (Native)</option>
+            </select>
+          </div>
+
           <div className="flex gap-3">
             <button
               id="generate-ui-code-btn"
@@ -142,10 +158,18 @@ export default function UIToCode() {
                 <div className="glass rounded-xl p-4 flex items-center gap-4">
                   <ConfidenceMeter value={result.confidence} size={72} />
                   <div className="flex-1">
-                    <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1">Description</p>
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Description</p>
+                      {result?.model && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono border border-indigo-500/20 bg-indigo-500/10 text-indigo-400">
+                          {result.model}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-zinc-300">{d.description}</p>
                   </div>
                 </div>
+
 
                 {/* Component breakdown */}
                 <div className="glass rounded-xl p-4">

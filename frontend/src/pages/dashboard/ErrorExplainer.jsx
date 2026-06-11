@@ -33,6 +33,7 @@ export default function ErrorExplainer() {
   const [text, setText] = useState('')
   const [file, setFile] = useState(null)
   const [deepOpen, setDeepOpen] = useState(false)
+  const [provider, setProvider] = useState('auto')
   const { run, loading, result, reset } = useAI('explainError')
 
   const handleSubmit = async () => {
@@ -41,7 +42,7 @@ export default function ErrorExplainer() {
       language: 'javascript',
       image: file || undefined,
     }
-    await run(payload)
+    await run(payload, provider)
   }
 
   const handleDemo = () => {
@@ -99,6 +100,21 @@ export default function ErrorExplainer() {
             />
           </div>
 
+          {/* Provider Selector */}
+          <div className="flex items-center gap-2 glass rounded-lg p-2.5 text-xs">
+            <span className="text-zinc-500 font-medium px-1">AI Provider:</span>
+            <select
+              value={provider}
+              onChange={e => setProvider(e.target.value)}
+              className="bg-transparent text-zinc-300 font-semibold border-none focus:outline-none cursor-pointer pr-4 flex-1"
+            >
+              <option value="auto" className="bg-zinc-950 text-zinc-300 font-medium">Auto (Fallback)</option>
+              <option value="groq" className="bg-zinc-950 text-zinc-300 font-medium">Groq (Fast)</option>
+              <option value="openrouter" className="bg-zinc-950 text-zinc-300 font-medium">OpenRouter (Versatile)</option>
+              <option value="gemini" className="bg-zinc-950 text-zinc-300 font-medium">Gemini (Native)</option>
+            </select>
+          </div>
+
           <div className="flex gap-3">
             <button
               id="analyze-error-btn"
@@ -144,12 +160,18 @@ export default function ErrorExplainer() {
               >
                 {/* Header row */}
                 <div className="glass rounded-xl p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     <SeverityBadge severity={d.severity} />
                     <span className="text-xs text-zinc-500 font-mono">{d.error_type}</span>
+                    {result?.model && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono border border-indigo-500/20 bg-indigo-500/10 text-indigo-400">
+                        {result.model}
+                      </span>
+                    )}
                   </div>
                   <ConfidenceMeter value={result.confidence} size={72} />
                 </div>
+
 
                 {/* Probable cause */}
                 <div className="glass rounded-xl p-5">

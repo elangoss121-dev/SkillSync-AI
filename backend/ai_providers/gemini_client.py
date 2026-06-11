@@ -1,14 +1,19 @@
 from google import genai
 from google.genai import types
 import os
+from typing import Tuple, Optional
 
 _client = None
 
 # Model priority list — tries in order until one succeeds
 MODELS = [
-    "gemini-1.5-flash",
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
     "gemini-2.0-flash",
+    "gemini-1.5-flash",
     "gemini-1.5-flash-8b",
+    "gemini-3.5-flash",
+    "gemini-2.5-pro",
     "gemini-1.5-pro",
 ]
 
@@ -26,35 +31,85 @@ def get_client(api_key: str = None) -> genai.Client:
     return _client
 
 
-async def generate(prompt: str, image_data: bytes = None, api_key: str = None) -> str:
-    """Generate a response from Gemini with automatic model fallback."""
-    client = get_client(api_key)
+async def generate(
+    prompt: str,
+    image_data: bytes = None,
+    api_key: Optional[str] = None,
+    groq_api_key: Optional[str] = None,
+    openrouter_api_key: Optional[str] = None,
+    preferred_provider: Optional[str] = "auto",
+) -> Tuple[str, str]:
+    """Generate a response using a customizable chain of providers (Groq, OpenRouter, Gemini)."""
+    
+    async def try_groq():
+        from ai_providers import groq_client
+        effective_groq_key = groq_client.get_api_key(groq_api_key)
+        if effective_groq_key and effective_groq_key != "your_groq_api_key_here":
+            return await groq_client.generate(prompt, api_key=effective_groq_key)
+        raise ValueError("Groq key not configured")
 
-    contents = [prompt]
-    if image_data:
-        import PIL.Image
-        import io
-        img = PIL.Image.open(io.BytesIO(image_data))
-        contents = [img, prompt]
+    async def try_openrouter():
+        from ai_providers import openrouter_client
+        effective_or_key = openrouter_client.get_api_key(openrouter_api_key)
+        if effective_or_key and effective_or_key != "your_openrouter_api_key_here":
+            return await openrouter_client.generate(prompt, api_key=effective_or_key)
+        raise ValueError("OpenRouter key not configured")
 
-    last_error = None
-    for model in MODELS:
-        try:
-            response = await client.aio.models.generate_content(
-                model=model,
-                contents=contents,
-            )
-            return response.text
-        except Exception as e:
-            err_str = str(e)
-            # Only retry on quota/resource errors
-            if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "quota" in err_str.lower():
+    async def try_gemini():
+        client = get_client(api_key)
+        contents = [prompt]
+        if image_data:
+            import PIL.Image
+            import io
+            img = PIL.Image.open(io.BytesIO(image_data))
+            contents = [img, prompt]
+
+        last_error = None
+        for model in MODELS:
+            try:
+                response = await client.aio.models.generate_content(
+                    model=model,
+                    contents=contents,
+                )
+                return response.text, model
+            except Exception as e:
+                err_str = str(e)
+                if "API_KEY_INVALID" in err_str or "api key not valid" in err_str.lower() or "invalid api key" in err_str.lower():
+                    raise
                 last_error = e
                 continue
-            # For other errors, raise immediately
-            raise
+        raise last_error or Exception("All Gemini models failed")
 
-    raise last_error or Exception("All Gemini models failed")
+    # If image data is present, we must use Gemini (vision support)
+    if image_data:
+        return await try_gemini()
+
+    # Determine execution priority chain
+    provider = (preferred_provider or "auto").lower().strip()
+    if provider == "groq":
+        chain = [try_groq, try_openrouter, try_gemini]
+    elif provider == "openrouter":
+        chain = [try_openrouter, try_groq, try_gemini]
+    elif provider == "gemini":
+        chain = [try_gemini, try_groq, try_openrouter]
+    else:  # auto
+        chain = [try_groq, try_openrouter, try_gemini]
+
+    last_error = None
+    for attempt_func in chain:
+        try:
+            return await attempt_func()
+        except Exception as e:
+            # Continue on failures unless it is an explicit auth error
+            err_str = str(e)
+            if "API_KEY_INVALID" in err_str or "Authentication Failed" in err_str:
+                raise
+            last_error = e
+            continue
+
+    raise last_error or Exception("All AI providers failed to generate content")
+
+
 
 
 def is_available() -> bool:

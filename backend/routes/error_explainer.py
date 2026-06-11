@@ -14,6 +14,9 @@ async def explain_error(
     image: Optional[UploadFile] = File(None),
 ):
     api_key = request.headers.get("X-API-Key") or None
+    groq_api_key = request.headers.get("X-Groq-API-Key") or None
+    openrouter_api_key = request.headers.get("X-OpenRouter-API-Key") or None
+    preferred_provider = request.headers.get("X-Preferred-Provider") or "auto"
     image_bytes = await image.read() if image else None
     result = await analyze_error(
         text=text,
@@ -21,5 +24,11 @@ async def explain_error(
         language=language,
         image_bytes=image_bytes,
         api_key=api_key,
+        groq_api_key=groq_api_key,
+        openrouter_api_key=openrouter_api_key,
+        preferred_provider=preferred_provider,
     )
     return result
+
+
+

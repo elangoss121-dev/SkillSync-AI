@@ -13,15 +13,27 @@ const getApiKey = () => {
   return localStorage.getItem('skillsync_api_key') || ''
 }
 
+const getGroqApiKey = () => {
+  return localStorage.getItem('skillsync_groq_api_key') || ''
+}
+
+const getOpenrouterApiKey = () => {
+  return localStorage.getItem('skillsync_openrouter_api_key') || ''
+}
+
 const createClient = () => {
   return axios.create({
     baseURL: getBaseUrl(),
     headers: {
       'X-API-Key': getApiKey(),
+      'X-Groq-API-Key': getGroqApiKey(),
+      'X-OpenRouter-API-Key': getOpenrouterApiKey(),
     },
     timeout: 60000,
   })
 }
+
+
 
 /** Build a FormData from a plain object (skip undefined values) */
 function toForm(obj) {
@@ -35,25 +47,26 @@ function toForm(obj) {
 }
 
 export const api = {
-  explainError: (payload) =>
+  explainError: (payload, headers = {}) =>
     createClient().post('/api/explain-error', toForm(payload), {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'multipart/form-data', ...headers },
     }),
 
-  generateDocs: (payload) =>
+  generateDocs: (payload, headers = {}) =>
     createClient().post('/api/generate-docs', toForm(payload), {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'multipart/form-data', ...headers },
     }),
 
-  simplifyCode: (payload) =>
+  simplifyCode: (payload, headers = {}) =>
     createClient().post('/api/simplify-code', toForm(payload), {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'multipart/form-data', ...headers },
     }),
 
-  uiToCode: (formData) =>
+  uiToCode: (formData, headers = {}) =>
     createClient().post('/api/ui-to-code', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'multipart/form-data', ...headers },
     }),
 
   health: () => createClient().get('/api/health'),
 }
+

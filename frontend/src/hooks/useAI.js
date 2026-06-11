@@ -27,7 +27,7 @@ export function useAI(feature) {
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
 
-  const run = useCallback(async (payload) => {
+  const run = useCallback(async (payload, provider = 'auto') => {
     setLoading(true)
     setError(null)
     setResult(null)
@@ -41,7 +41,8 @@ export function useAI(feature) {
         return mock
       }
 
-      const res = await api[feature](payload)
+      const headers = provider && provider !== 'auto' ? { 'X-Preferred-Provider': provider } : {}
+      const res = await api[feature](payload, headers)
       // res.data is the full API response body: { success, confidence, data, model, demo_mode }
       setResult(res.data)
       addToast('AI analysis complete ✓', 'success')
@@ -55,6 +56,7 @@ export function useAI(feature) {
       setLoading(false)
     }
   }, [demoMode, feature, addToast])
+
 
   const reset = useCallback(() => {
     setResult(null)

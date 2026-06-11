@@ -49,6 +49,7 @@ export default function DocsGenerator() {
   const [file, setFile] = useState(null)
   const [pastedCode, setPastedCode] = useState('')
   const [activeTab, setActiveTab] = useState('readme')
+  const [provider, setProvider] = useState('auto')
   const { run, loading, result, reset } = useAI('generateDocs')
   const { addToast } = useApp()
 
@@ -57,7 +58,7 @@ export default function DocsGenerator() {
       github_url: githubUrl || (file || pastedCode ? undefined : MOCK_SAMPLE_GITHUB_URL),
       source_code: pastedCode,
       file: file || undefined,
-    })
+    }, provider)
   }
 
   const d = result?.data
@@ -138,6 +139,21 @@ export default function DocsGenerator() {
             />
           </div>
 
+          {/* Provider Selector */}
+          <div className="flex items-center gap-2 glass rounded-lg p-2.5 text-xs">
+            <span className="text-zinc-500 font-medium px-1">AI Provider:</span>
+            <select
+              value={provider}
+              onChange={e => setProvider(e.target.value)}
+              className="bg-transparent text-zinc-300 font-semibold border-none focus:outline-none cursor-pointer pr-4 flex-1"
+            >
+              <option value="auto" className="bg-zinc-950 text-zinc-300 font-medium">Auto (Fallback)</option>
+              <option value="groq" className="bg-zinc-950 text-zinc-300 font-medium">Groq (Fast)</option>
+              <option value="openrouter" className="bg-zinc-950 text-zinc-300 font-medium">OpenRouter (Versatile)</option>
+              <option value="gemini" className="bg-zinc-950 text-zinc-300 font-medium">Gemini (Native)</option>
+            </select>
+          </div>
+
           <button
             id="generate-docs-btn"
             onClick={handleSubmit}
@@ -164,23 +180,31 @@ export default function DocsGenerator() {
           >
             {/* Toolbar */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1 p-1 glass rounded-xl">
-                {TABS.map(tab => {
-                  const Icon = tab.icon
-                  return (
-                    <button
-                      key={tab.id}
-                      id={`docs-tab-${tab.id}`}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
-                        ${activeTab === tab.id ? 'tab-active' : 'tab-inactive'}`}
-                    >
-                      <Icon className="w-3.5 h-3.5" />
-                      {tab.label}
-                    </button>
-                  )
-                })}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1 p-1 glass rounded-xl">
+                  {TABS.map(tab => {
+                    const Icon = tab.icon
+                    return (
+                      <button
+                        key={tab.id}
+                        id={`docs-tab-${tab.id}`}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
+                          ${activeTab === tab.id ? 'tab-active' : 'tab-inactive'}`}
+                      >
+                        <Icon className="w-3.5 h-3.5" />
+                        {tab.label}
+                      </button>
+                    )
+                  })}
+                </div>
+                {result?.model && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono border border-indigo-500/20 bg-indigo-500/10 text-indigo-400">
+                    {result.model}
+                  </span>
+                )}
               </div>
+
               <div className="flex items-center gap-2">
                 <button onClick={handleCopy} className="btn-ghost text-xs">
                   <Copy className="w-3.5 h-3.5" /> Copy

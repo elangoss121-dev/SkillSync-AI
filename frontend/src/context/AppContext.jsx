@@ -7,6 +7,12 @@ export function AppProvider({ children }) {
   const [apiKey, setApiKey] = useState(() => {
     return localStorage.getItem('skillsync_api_key') || ''
   })
+  const [groqApiKey, setGroqApiKey] = useState(() => {
+    return localStorage.getItem('skillsync_groq_api_key') || ''
+  })
+  const [openrouterApiKey, setOpenrouterApiKey] = useState(() => {
+    return localStorage.getItem('skillsync_openrouter_api_key') || ''
+  })
   const [backendUrl, setBackendUrl] = useState(() => {
     return localStorage.getItem('skillsync_backend_url') || import.meta.env.VITE_API_URL || ''
   })
@@ -77,6 +83,8 @@ export function AppProvider({ children }) {
     <AppContext.Provider value={{
       demoMode, toggleDemoMode,
       apiKey, setApiKey,
+      groqApiKey, setGroqApiKey,
+      openrouterApiKey, setOpenrouterApiKey,
       backendUrl, setBackendUrl,
       toasts, addToast, removeToast,
       theme, toggleTheme,

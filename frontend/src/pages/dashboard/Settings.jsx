@@ -4,18 +4,26 @@ import { Settings as SettingsIcon, Key, Globe, Zap, Save, Eye, EyeOff, CheckCirc
 import { useApp } from '../../context/AppContext'
 
 export default function Settings() {
-  const { apiKey, setApiKey, backendUrl, setBackendUrl, demoMode, toggleDemoMode, addToast, theme, toggleTheme } = useApp()
+  const { apiKey, setApiKey, groqApiKey, setGroqApiKey, openrouterApiKey, setOpenrouterApiKey, backendUrl, setBackendUrl, demoMode, toggleDemoMode, addToast, theme, toggleTheme } = useApp()
   const isDark = theme === 'dark'
   const [localKey, setLocalKey] = useState(apiKey)
+  const [localGroqKey, setLocalGroqKey] = useState(groqApiKey)
+  const [localOrKey, setLocalOrKey] = useState(openrouterApiKey)
   const [localUrl, setLocalUrl] = useState(backendUrl)
   const [showKey, setShowKey] = useState(false)
+  const [showGroqKey, setShowGroqKey] = useState(false)
+  const [showOrKey, setShowOrKey] = useState(false)
   const [saved, setSaved] = useState(false)
 
 
   const handleSave = () => {
     setApiKey(localKey)
+    setGroqApiKey(localGroqKey)
+    setOpenrouterApiKey(localOrKey)
     setBackendUrl(localUrl)
     localStorage.setItem('skillsync_api_key', localKey)
+    localStorage.setItem('skillsync_groq_api_key', localGroqKey)
+    localStorage.setItem('skillsync_openrouter_api_key', localOrKey)
     localStorage.setItem('skillsync_backend_url', localUrl)
     setSaved(true)
     addToast('Settings saved!', 'success')
@@ -113,6 +121,66 @@ export default function Settings() {
               className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
             >
               {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Groq API Key */}
+        <div className="glass rounded-xl p-5 space-y-3">
+          <div className="flex items-center gap-2 mb-1">
+            <Key className="w-4 h-4 text-orange-400" />
+            <span className="text-sm font-semibold text-white">Groq API Key</span>
+          </div>
+          <p className="text-xs text-zinc-500">
+            Get your key from{' '}
+            <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">
+              console.groq.com
+            </a>
+          </p>
+          <div className="relative">
+            <input
+              id="groq-api-key-input"
+              type={showGroqKey ? 'text' : 'password'}
+              className="input-dark pr-10"
+              placeholder="gsk_..."
+              value={localGroqKey}
+              onChange={e => setLocalGroqKey(e.target.value)}
+            />
+            <button
+              onClick={() => setShowGroqKey(s => !s)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+            >
+              {showGroqKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+
+        {/* OpenRouter API Key */}
+        <div className="glass rounded-xl p-5 space-y-3">
+          <div className="flex items-center gap-2 mb-1">
+            <Key className="w-4 h-4 text-rose-400" />
+            <span className="text-sm font-semibold text-white">OpenRouter API Key</span>
+          </div>
+          <p className="text-xs text-zinc-500">
+            Get your key from{' '}
+            <a href="https://openrouter.ai" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">
+              openrouter.ai
+            </a>
+          </p>
+          <div className="relative">
+            <input
+              id="openrouter-api-key-input"
+              type={showOrKey ? 'text' : 'password'}
+              className="input-dark pr-10"
+              placeholder="sk-or-v1-..."
+              value={localOrKey}
+              onChange={e => setLocalOrKey(e.target.value)}
+            />
+            <button
+              onClick={() => setShowOrKey(s => !s)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+            >
+              {showOrKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
         </div>

@@ -5,7 +5,15 @@ from fastapi import HTTPException
 from typing import Optional
 
 
-async def simplify_code(code: str, language: str, beginner_mode: bool, api_key: Optional[str] = None) -> dict:
+async def simplify_code(
+    code: str,
+    language: str,
+    beginner_mode: bool,
+    api_key: Optional[str] = None,
+    groq_api_key: Optional[str] = None,
+    openrouter_api_key: Optional[str] = None,
+    preferred_provider: Optional[str] = "auto",
+) -> dict:
     if not code.strip():
         raise HTTPException(status_code=400, detail="Code cannot be empty")
 
@@ -22,9 +30,18 @@ Code to analyze:
 Respond with valid JSON only."""
 
     try:
-        raw = await gemini_client.generate(prompt, api_key=api_key)
+        raw, model_used = await gemini_client.generate(
+            prompt,
+            api_key=api_key,
+            groq_api_key=groq_api_key,
+            openrouter_api_key=openrouter_api_key,
+            preferred_provider=preferred_provider,
+        )
+
+
         data = extract_json(raw)
-        return build_response(data, confidence=0.87)
+        return build_response(data, confidence=0.87, model_name=model_used)
+
     except ValueError as e:
         raise HTTPException(status_code=500, detail=f"AI parsing error: {str(e)}")
     except Exception as e:

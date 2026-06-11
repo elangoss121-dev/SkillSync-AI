@@ -37,11 +37,12 @@ export default function CodeSimplifier() {
   const [code, setCode] = useState(MOCK_SAMPLE_CODE)
   const [language, setLanguage] = useState('python')
   const [beginnerMode, setBeginnerMode] = useState(false)
+  const [provider, setProvider] = useState('auto')
   const { run, loading, result, reset } = useAI('simplifyCode')
   const { addToast } = useApp()
 
   const handleSubmit = () => {
-    run({ code, language, beginner_mode: beginnerMode })
+    run({ code, language, beginner_mode: beginnerMode }, provider)
   }
 
   const d = result?.data
@@ -95,6 +96,21 @@ export default function CodeSimplifier() {
           {beginnerMode ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
           Explain Like Beginner
         </button>
+
+        {/* Provider selector */}
+        <div className="flex items-center gap-2 glass rounded-lg p-1.5 text-xs">
+          <span className="text-zinc-500 font-medium px-2">AI Provider:</span>
+          <select
+            value={provider}
+            onChange={e => setProvider(e.target.value)}
+            className="bg-transparent text-zinc-300 font-semibold border-none focus:outline-none cursor-pointer pr-4"
+          >
+            <option value="auto" className="bg-zinc-950 text-zinc-300 font-medium">Auto (Fallback)</option>
+            <option value="groq" className="bg-zinc-950 text-zinc-300 font-medium">Groq (Fast)</option>
+            <option value="openrouter" className="bg-zinc-950 text-zinc-300 font-medium">OpenRouter (Versatile)</option>
+            <option value="gemini" className="bg-zinc-950 text-zinc-300 font-medium">Gemini (Native)</option>
+          </select>
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-5">
@@ -147,10 +163,18 @@ export default function CodeSimplifier() {
                 <div className="glass rounded-xl p-4">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Analysis</span>
-                    <span className="px-2 py-0.5 rounded-full text-xs border badge-warning">{d.complexity_label}</span>
+                    <div className="flex items-center gap-2">
+                      {result?.model && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono border border-indigo-500/20 bg-indigo-500/10 text-indigo-400">
+                          {result.model}
+                        </span>
+                      )}
+                      <span className="px-2 py-0.5 rounded-full text-xs border badge-warning">{d.complexity_label}</span>
+                    </div>
                   </div>
                   <ComplexityBar score={d.complexity_score} />
                 </div>
+
 
                 {/* Algorithm explanation */}
                 <div className="glass rounded-xl p-4">

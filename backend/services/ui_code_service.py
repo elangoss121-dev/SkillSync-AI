@@ -5,7 +5,14 @@ from fastapi import HTTPException
 from typing import Optional
 
 
-async def convert_ui_to_code(image_bytes: Optional[bytes], description: Optional[str], api_key: Optional[str] = None) -> dict:
+async def convert_ui_to_code(
+    image_bytes: Optional[bytes],
+    description: Optional[str],
+    api_key: Optional[str] = None,
+    groq_api_key: Optional[str] = None,
+    openrouter_api_key: Optional[str] = None,
+    preferred_provider: Optional[str] = "auto",
+) -> dict:
     if not image_bytes and not description:
         raise HTTPException(status_code=400, detail="Provide an image or description")
 
@@ -16,9 +23,19 @@ Analyze the UI design in the image and generate React + Tailwind code.
 Respond with valid JSON only."""
 
     try:
-        raw = await gemini_client.generate(prompt, image_bytes, api_key=api_key)
+        raw, model_used = await gemini_client.generate(
+            prompt,
+            image_bytes,
+            api_key=api_key,
+            groq_api_key=groq_api_key,
+            openrouter_api_key=openrouter_api_key,
+            preferred_provider=preferred_provider,
+        )
+
+
         data = extract_json(raw)
-        return build_response(data, confidence=0.83)
+        return build_response(data, confidence=0.83, model_name=model_used)
+
     except ValueError as e:
         raise HTTPException(status_code=500, detail=f"AI parsing error: {str(e)}")
     except Exception as e:

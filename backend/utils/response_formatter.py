@@ -37,11 +37,12 @@ def extract_json(raw: str) -> dict:
     raise ValueError(f"Could not extract valid JSON from response: {raw[:200]}")
 
 
-def build_response(data: dict, confidence: float = 0.85, demo_mode: bool = False) -> dict:
+def build_response(data: dict, confidence: float = 0.85, demo_mode: bool = False, model_name: str = "gemini-1.5-flash") -> dict:
     return {
         "success": True,
         "confidence": confidence,
         "data": data,
-        "model": "gemini-1.5-flash" + (" (demo)" if demo_mode else ""),
+        "model": model_name + (" (demo)" if demo_mode else ""),
         "demo_mode": demo_mode,
     }
+
