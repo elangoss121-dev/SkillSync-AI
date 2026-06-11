@@ -1,7 +1,8 @@
 import { useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { motion } from 'framer-motion'
-import { CheckCircle, XCircle, User, Zap, Sun, Moon } from 'lucide-react'
+import { CheckCircle, XCircle, User, Zap } from 'lucide-react'
+import ThemeToggle from '../ui/ThemeToggle'
 
 const PAGE_NAMES = {
   '/dashboard/error-explainer': 'AI Error Explainer',
@@ -36,29 +37,7 @@ export default function Navbar() {
 
       <div className="flex items-center gap-3">
         {/* Theme toggle */}
-        <button
-          id="theme-toggle-btn"
-          onClick={toggleTheme}
-          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 border"
-          style={{
-            background: isDark ? 'rgba(250,204,21,0.1)' : 'rgba(99,102,241,0.1)',
-            borderColor: isDark ? 'rgba(250,204,21,0.25)' : 'rgba(99,102,241,0.25)',
-          }}
-        >
-          <motion.div
-            key={isDark ? 'moon' : 'sun'}
-            initial={{ scale: 0.5, rotate: -90, opacity: 0 }}
-            animate={{ scale: 1, rotate: 0, opacity: 1 }}
-            exit={{ scale: 0.5, rotate: 90, opacity: 0 }}
-            transition={{ duration: 0.25 }}
-          >
-            {isDark
-              ? <Sun className="w-3.5 h-3.5 text-yellow-400" />
-              : <Moon className="w-3.5 h-3.5 text-indigo-500" />
-            }
-          </motion.div>
-        </button>
+        <ThemeToggle />
 
         {/* Demo mode toggle */}
         <button

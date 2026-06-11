@@ -87,7 +87,7 @@ export default function DocsGenerator() {
           <FileText className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-white">Documentation Generator</h2>
+          <h2 className="text-xl font-bold text-[var(--text-primary)]">Documentation Generator</h2>
           <p className="text-sm text-zinc-500">From GitHub URL, ZIP, or source files — auto-generate beautiful docs</p>
         </div>
       </div>

@@ -47,7 +47,7 @@ export default function UIToCode() {
           <Image className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-white">UI to Code</h2>
+          <h2 className="text-xl font-bold text-[var(--text-primary)]">UI to Code</h2>
           <p className="text-sm text-zinc-500">Upload a wireframe or screenshot — get production-ready React + Tailwind</p>
         </div>
       </div>

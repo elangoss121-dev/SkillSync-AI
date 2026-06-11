@@ -59,7 +59,7 @@ export default function CodeSimplifier() {
           <Code2 className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-white">Code Simplifier</h2>
+          <h2 className="text-xl font-bold text-[var(--text-primary)]">Code Simplifier</h2>
           <p className="text-sm text-zinc-500">Paste complex code — get line-by-line explanations and optimizations</p>
         </div>
       </div>

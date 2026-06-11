@@ -69,23 +69,35 @@ export default function Sidebar() {
           <NavLink
             key={to}
             to={to}
-            className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}
+            className={({ isActive }) => `sidebar-item relative ${isActive ? 'text-primary font-semibold' : 'text-zinc-400'}`}
             title={collapsed ? label : undefined}
           >
-            <Icon className={`w-4 h-4 flex-shrink-0 ${color}`} />
-            <AnimatePresence>
-              {!collapsed && (
-                <motion.span
-                  initial={{ opacity: 0, x: -5 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -5 }}
-                  transition={{ duration: 0.15 }}
-                  className="whitespace-nowrap text-sm"
-                >
-                  {label}
-                </motion.span>
-              )}
-            </AnimatePresence>
+            {({ isActive }) => (
+              <>
+                {isActive && (
+                  <motion.div
+                    layoutId="activeSidebarIndicator"
+                    className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-l-[3px] border-indigo-500 rounded-r-md -z-10"
+                    style={{ left: 0, right: 0 }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                  />
+                )}
+                <Icon className={`w-4 h-4 flex-shrink-0 z-10 ${color}`} />
+                <AnimatePresence>
+                  {!collapsed && (
+                    <motion.span
+                      initial={{ opacity: 0, x: -5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -5 }}
+                      transition={{ duration: 0.15 }}
+                      className="whitespace-nowrap text-sm z-10"
+                    >
+                      {label}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
