@@ -108,6 +108,7 @@ def create_user(
     """
     Insert a new user. Returns the created user (public fields) as a dict,
     or None if the email / username already exists.
+    """
     hashed       = hash_password(password)
     avatar_color = random.choice(AVATAR_COLORS)
     # Auto-generate username from email if not provided
