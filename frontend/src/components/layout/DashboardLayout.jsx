@@ -1,19 +1,16 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Navbar from './Navbar'
 import CommandPalette from '../ui/CommandPalette'
 import FloatingAIAssistant from '../ui/FloatingAIAssistant'
-import { useApp } from '../../context/AppContext'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Cpu, Activity, Server, Radio, ChevronRight, X, Clock, BarChart2, Shield } from 'lucide-react'
+import { Activity, Server, Radio, X, Shield } from 'lucide-react'
 
 export default function DashboardLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isInsightsOpen, setIsInsightsOpen] = useState(false)
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
-  const { theme } = useApp()
-  const isDark = theme === 'dark'
 
   // Telemetry items
   const telemetry = [

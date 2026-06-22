@@ -2,7 +2,6 @@ import { useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { motion } from 'framer-motion'
 import { Upload, FileText, X } from 'lucide-react'
-import { useApp } from '../../context/AppContext'
 
 export default function FileDropzone({
   onFile,
@@ -14,9 +13,6 @@ export default function FileDropzone({
   maxSize = 10 * 1024 * 1024,
   id = 'file-dropzone',
 }) {
-  const { theme } = useApp()
-  const isDark = theme === 'dark'
-
   const onDrop = useCallback(accepted => {
     if (accepted.length > 0) onFile(accepted[0])
   }, [onFile])

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bug, Terminal, Copy, RefreshCw, ChevronDown, ChevronUp, Lightbulb, Wrench, AlertTriangle } from 'lucide-react'
+import { Bug, Copy, RefreshCw, ChevronDown, ChevronUp, Lightbulb, Wrench, AlertTriangle } from 'lucide-react'
 import { useAI } from '../../hooks/useAI'
 import FileDropzone from '../../components/ui/FileDropzone'
 import SeverityBadge from '../../components/ui/SeverityBadge'
@@ -34,8 +34,6 @@ export default function ErrorExplainer() {
   const [file, setFile] = useState(null)
   const [deepOpen, setDeepOpen] = useState(false)
   const { run, loading, result, reset } = useAI('explainError')
-  const { theme } = useApp()
-  const isDark = theme === 'dark'
 
   const handleSubmit = async () => {
     const payload = {

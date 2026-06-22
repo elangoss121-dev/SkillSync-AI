@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import {
   Terminal as TerminalIcon, FileText, Code2, Layout, ArrowRight,
-  Sparkles, CheckCircle2, ChevronRight, Play, Cpu, Server, Activity
+  Sparkles, Play, Cpu, Server, Activity
 } from 'lucide-react'
-import { useApp } from '../context/AppContext'
 
 // 4 Simulator States for the Interactive Terminal Preview
 const SIMULATIONS = [
@@ -102,8 +101,6 @@ export default function LandingPage() {
   const navigate = useNavigate()
   const [activeSimId, setActiveSimId] = useState('error')
   const activeSim = SIMULATIONS.find(s => s.id === activeSimId)
-  const { theme } = useApp()
-  const isDark = theme === 'dark'
 
   // Auto-switch simulator tabs every 6 seconds
   useEffect(() => {

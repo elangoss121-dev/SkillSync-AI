@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Eye, EyeOff, Mail, Lock, User, Cpu, ArrowRight, Check, Sparkles } from 'lucide-react'
@@ -37,7 +37,7 @@ export default function LoginPage() {
 
   const strength = tab === 'signup' ? getPasswordStrength(password) : null
 
-  const handleGoogleLogin = async (response) => {
+  const handleGoogleLogin = useCallback(async (response) => {
     setError('')
     setSuccess('')
     setLoading(true)
@@ -56,16 +56,16 @@ export default function LoginPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [navigate])
 
   useEffect(() => {
     /* global google */
-    if (window.google) {
-      window.google.accounts.id.initialize({
+    if (typeof google !== 'undefined') {
+      google.accounts.id.initialize({
         client_id: "206983008751-b0t50s6fedqijv24ig51jds4k64j708d.apps.googleusercontent.com",
         callback: handleGoogleLogin,
       })
-      window.google.accounts.id.renderButton(
+      google.accounts.id.renderButton(
         document.getElementById("google-signin-btn"),
         { 
           theme: isDark ? "filled_black" : "outline", 
@@ -76,7 +76,7 @@ export default function LoginPage() {
         }
       )
     }
-  }, [tab, theme, isDark])
+  }, [tab, theme, isDark, handleGoogleLogin])
 
   // Check if already logged in
   useEffect(() => {

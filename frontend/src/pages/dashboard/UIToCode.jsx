@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Image as ImageIcon, Sparkles, Copy, RefreshCw, ExternalLink, Layers, CheckCircle2, Loader, Circle, History, FolderOpen, Code, Eye, Box, FileImage } from 'lucide-react'
+import { Sparkles, ExternalLink, CheckCircle2, Loader, Circle, History, FolderOpen, Code, Eye, Box, FileImage } from 'lucide-react'
 import { useAI } from '../../hooks/useAI'
 import FileDropzone from '../../components/ui/FileDropzone'
 import ConfidenceMeter from '../../components/ui/ConfidenceMeter'
@@ -25,8 +24,6 @@ export default function UIToCode() {
 
   useEffect(() => {
     if (loading) {
-      setActiveTab('preview')
-      setActiveStep(1)
       const timer1 = setTimeout(() => setActiveStep(2), 1800)
       const timer2 = setTimeout(() => setActiveStep(3), 3600)
       const timer3 = setTimeout(() => setActiveStep(4), 5400)
@@ -35,8 +32,6 @@ export default function UIToCode() {
         clearTimeout(timer2)
         clearTimeout(timer3)
       }
-    } else {
-      setActiveStep(0)
     }
   }, [loading])
 
@@ -63,15 +58,19 @@ export default function UIToCode() {
     }, 80)
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setActiveTab('preview')
+    setActiveStep(1)
     if (!file && !description && !result) {
-      run({})
+      await run({})
+      setActiveStep(0)
       return
     }
     const formData = new FormData()
     if (file) formData.append('image', file)
     if (description) formData.append('description', description)
-    run(formData)
+    await run(formData)
+    setActiveStep(0)
   }
 
   const handleReset = () => {

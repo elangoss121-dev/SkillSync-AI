@@ -11,7 +11,7 @@ const BREADCRUMBS = {
 
 export default function Navbar({ onMenuClick, onInsightsToggle, onSearchClick }) {
   const { pathname } = useLocation()
-  const { user, logout } = useApp()
+  const { user, logout, demoMode, toggleDemoMode } = useApp()
   
   const crumbs = BREADCRUMBS[pathname] || ['src', 'pages', 'Dashboard.jsx']
 
@@ -87,6 +87,22 @@ export default function Navbar({ onMenuClick, onInsightsToggle, onSearchClick })
           title="Search actions (Ctrl+K)"
         >
           <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
+        </button>
+
+        {/* Demo Mode Toggle */}
+        <button
+          onClick={toggleDemoMode}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded border transition-all cursor-pointer bg-transparent"
+          style={{
+            borderColor: demoMode ? 'var(--accent-primary)' : 'var(--border)',
+            color: demoMode ? 'var(--accent-primary)' : 'var(--text-secondary)',
+            backgroundColor: demoMode ? 'var(--accent-primary-glow)' : 'transparent',
+            boxShadow: demoMode ? '0 0 10px var(--accent-primary-glow)' : 'none',
+          }}
+          title={demoMode ? "Disable Demo Mode (use live AI)" : "Enable Demo Mode (use mock data)"}
+        >
+          <span className={`w-1.5 h-1.5 rounded-full ${demoMode ? 'bg-[#FF6B35] animate-pulse' : 'bg-zinc-550'}`} style={{ backgroundColor: demoMode ? 'var(--accent-primary)' : undefined }} />
+          <span>Demo Mode</span>
         </button>
 
         {/* Insights Toggle button */}

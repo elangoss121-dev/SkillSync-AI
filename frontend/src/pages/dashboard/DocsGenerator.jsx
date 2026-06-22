@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FileText, Link, Download, Copy, RefreshCw, BookOpen, Code, Settings2, FolderTree } from 'lucide-react'
+import { FileText, Link, BookOpen, Code, Settings2, FolderTree } from 'lucide-react'
 import { useAI } from '../../hooks/useAI'
 import FileDropzone from '../../components/ui/FileDropzone'
 import { ThinkingLoader } from '../../components/ui/AISkeleton'
@@ -50,8 +50,7 @@ export default function DocsGenerator() {
   const [pastedCode, setPastedCode] = useState('')
   const [activeTab, setActiveTab] = useState('readme')
   const { run, loading, result, reset } = useAI('generateDocs')
-  const { addToast, theme } = useApp()
-  const isDark = theme === 'dark'
+  const { addToast } = useApp()
 
   const handleSubmit = () => {
     run({

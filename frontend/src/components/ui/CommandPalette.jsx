@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Terminal, FileText, Code, Palette, LogOut, Sun, Moon, ArrowRight } from 'lucide-react'
 import { useApp } from '../../context/AppContext'

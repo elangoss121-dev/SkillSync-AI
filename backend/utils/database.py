@@ -107,7 +107,7 @@ def create_user(
 ) -> dict | None:
     """
     Insert a new user. Returns the created user (public fields) as a dict,
-    or None if the email / username already exists.
+    or None if the email already exists.
     """
     hashed       = hash_password(password)
     avatar_color = random.choice(AVATAR_COLORS)
@@ -115,8 +115,23 @@ def create_user(
     if not username:
         username = email.split("@")[0].lower().replace(".", "_")
 
+    username = username.lower().strip()
+    # Filter username to keep only alphanumeric and underscores
+    username = "".join(c for c in username if c.isalnum() or c == "_")
+    if not username:
+        username = "user"
+
     conn = get_connection()
     try:
+        # Resolve username conflicts dynamically
+        base_username = username
+        while True:
+            row = conn.execute("SELECT id FROM users WHERE username = ?", (username,)).fetchone()
+            if not row:
+                break
+            # Append a random 3-digit number to make it unique
+            username = f"{base_username}_{random.randint(100, 999)}"
+
         conn.execute(
             """INSERT INTO users
                (name, username, email, phone, date_of_birth, gender, bio,
@@ -124,7 +139,7 @@ def create_user(
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 name,
-                username.lower().strip(),
+                username,
                 email.lower().strip(),
                 phone or None,
                 date_of_birth or None,
@@ -141,7 +156,7 @@ def create_user(
         ).fetchone()
         return dict(row) if row else None
     except sqlite3.IntegrityError:
-        return None          # duplicate email or username
+        return None          # duplicate email
     finally:
         conn.close()
 

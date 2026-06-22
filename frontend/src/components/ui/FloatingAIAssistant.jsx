@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { MessageSquare, X, Send, Terminal, Loader } from 'lucide-react'
 import { useAI } from '../../hooks/useAI'
 import ReactMarkdown from 'react-markdown'
@@ -48,7 +48,7 @@ export default function FloatingAIAssistant() {
       } else {
         setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I couldn\'t generate a response. Please check your network or try again.' }])
       }
-    } catch (err) {
+    } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: 'An error occurred while communicating with the AI server.' }])
     }
   }

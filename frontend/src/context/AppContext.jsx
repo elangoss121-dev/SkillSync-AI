@@ -4,6 +4,12 @@ const AppContext = createContext(null)
 
 export function AppProvider({ children }) {
   const [toasts, setToasts] = useState([])
+  const [demoMode, setDemoMode] = useState(() => {
+    try {
+      const raw = localStorage.getItem('skillsync_demo_mode')
+      return raw ? JSON.parse(raw) : true
+    } catch { return true }
+  })
 
   // ── current user (loaded from localStorage on mount) ──────────────────────
   const [user, setUser] = useState(() => {
@@ -50,11 +56,21 @@ export function AppProvider({ children }) {
     setToasts(prev => prev.filter(t => t.id !== id))
   }, [])
 
+  const toggleDemoMode = useCallback(() => {
+    setDemoMode(prev => {
+      const next = !prev
+      localStorage.setItem('skillsync_demo_mode', JSON.stringify(next))
+      addToast(next ? 'Demo mode enabled — using mock responses' : 'Demo mode disabled — using live API', next ? 'info' : 'success')
+      return next
+    })
+  }, [addToast])
+
   return (
     <AppContext.Provider value={{
       toasts, addToast, removeToast,
       theme, toggleTheme,
       user, login, logout,
+      demoMode, toggleDemoMode,
     }}>
       {children}
     </AppContext.Provider>

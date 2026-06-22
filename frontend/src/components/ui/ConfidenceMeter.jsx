@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useApp } from '../../context/AppContext'
 
 export default function ConfidenceMeter({ value = 0.85, size = 64 }) {
   const [animated, setAnimated] = useState(0)
-  const { theme } = useApp()
-  const isDark = theme === 'dark'
   
   const radius = (size - 12) / 2
   const circumference = 2 * Math.PI * radius

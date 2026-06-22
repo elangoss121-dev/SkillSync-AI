@@ -1,0 +1,77 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+D:\SkillSync AI\frontend\src\components\layout\DashboardLayout.jsx
+   1:8   error  'React' is defined but never used            no-unused-vars
+   9:10  error  'Cpu' is defined but never used              no-unused-vars
+   9:40  error  'ChevronRight' is defined but never used     no-unused-vars
+   9:57  error  'Clock' is defined but never used            no-unused-vars
+   9:64  error  'BarChart2' is defined but never used        no-unused-vars
+  16:9   error  'isDark' is assigned a value but never used  no-unused-vars
+
+D:\SkillSync AI\frontend\src\components\ui\CommandPalette.jsx
+  1:8  error  'React' is defined but never used  no-unused-vars
+
+D:\SkillSync AI\frontend\src\components\ui\ConfidenceMeter.jsx
+  7:9  error  'isDark' is assigned a value but never used  no-unused-vars
+
+D:\SkillSync AI\frontend\src\components\ui\FileDropzone.jsx
+  18:9  error  'isDark' is assigned a value but never used  no-unused-vars
+
+D:\SkillSync AI\frontend\src\components\ui\FloatingAIAssistant.jsx
+   1:8   error  'React' is defined but never used  no-unused-vars
+  51:14  error  'err' is defined but never used    no-unused-vars
+
+D:\SkillSync AI\frontend\src\pages\LandingPage.jsx
+    1:8   error  'React' is defined but never used            no-unused-vars
+    2:18  error  'AnimatePresence' is defined but never used  no-unused-vars
+    6:13  error  'CheckCircle2' is defined but never used     no-unused-vars
+    6:27  error  'ChevronRight' is defined but never used     no-unused-vars
+  106:9   error  'isDark' is assigned a value but never used  no-unused-vars
+
+D:\SkillSync AI\frontend\src\pages\LoginPage.jsx
+  62:15  error    'google' is defined but never used                                                                                    no-unused-vars
+  79:6   warning  React Hook useEffect has a missing dependency: 'handleGoogleLogin'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\SkillSync AI\frontend\src\pages\dashboard\CodeSimplifier.jsx
+   3:10  error  'Code2' is defined but never used            no-unused-vars
+   3:28  error  'Copy' is defined but never used             no-unused-vars
+  42:9   error  'isDark' is assigned a value but never used  no-unused-vars
+
+D:\SkillSync AI\frontend\src\pages\dashboard\DocsGenerator.jsx
+   3:26  error  'Download' is defined but never used         no-unused-vars
+   3:36  error  'Copy' is defined but never used             no-unused-vars
+   3:42  error  'RefreshCw' is defined but never used        no-unused-vars
+  54:9   error  'isDark' is assigned a value but never used  no-unused-vars
+
+D:\SkillSync AI\frontend\src\pages\dashboard\ErrorExplainer.jsx
+   3:15  error  'Terminal' is defined but never used         no-unused-vars
+  38:9   error  'isDark' is assigned a value but never used  no-unused-vars
+
+D:\SkillSync AI\frontend\src\pages\dashboard\UIToCode.jsx
+   2:10  error  'motion' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 no-unused-vars
+   2:18  error  'AnimatePresence' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        no-unused-vars
+   3:19  error  'ImageIcon' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              no-unused-vars
+   3:40  error  'Copy' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   no-unused-vars
+   3:46  error  'RefreshCw' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              no-unused-vars
+   3:71  error  'Layers' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 no-unused-vars
+  28:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  26 |   useEffect(() => {
+  27 |     if (loading) {
+> 28 |       setActiveTab('preview')
+     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  29 |       setActiveStep(1)
+  30 |       const timer1 = setTimeout(() => setActiveStep(2), 1800)
+  31 |       const timer2 = setTimeout(() => setActiveStep(3), 3600)  react-hooks/set-state-in-effect
+
+✖ 34 problems (33 errors, 1 warning)
+

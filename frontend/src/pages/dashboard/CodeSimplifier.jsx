@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Code2, RefreshCw, Copy, ToggleLeft, ToggleRight, Gauge, ChevronRight } from 'lucide-react'
+import { RefreshCw, ToggleLeft, ToggleRight, Gauge, ChevronRight } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { useAI } from '../../hooks/useAI'
 import { ThinkingLoader } from '../../components/ui/AISkeleton'
@@ -38,8 +38,7 @@ export default function CodeSimplifier() {
   const [language, setLanguage] = useState('python')
   const [beginnerMode, setBeginnerMode] = useState(false)
   const { run, loading, result, reset } = useAI('simplifyCode')
-  const { addToast, theme } = useApp()
-  const isDark = theme === 'dark'
+  const { addToast } = useApp()
 
   const handleSubmit = () => {
     run({ code, language, beginner_mode: beginnerMode })
