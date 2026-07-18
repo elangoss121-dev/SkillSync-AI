@@ -54,12 +54,16 @@ export default function GenerateTests() {
   const { addToast } = useApp()
 
   const handleSubmit = () => {
+    // Embed framework context into the source_code prompt so the AI generates tests correctly
+    const contextPrefix = `Generate comprehensive ${testFramework} unit tests with edge cases for the following code:\n\n`
+    const sourceWithContext = pastedCode
+      ? contextPrefix + pastedCode
+      : pastedCode
+
     run({
       github_url: githubUrl || (file || pastedCode ? undefined : MOCK_SAMPLE_GITHUB_URL),
-      source_code: pastedCode,
+      source_code: sourceWithContext || undefined,
       file: file || undefined,
-      mode: 'unit_tests',
-      framework: testFramework,
     })
   }
 
@@ -71,7 +75,8 @@ export default function GenerateTests() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${activeTab}.test.ts`
+    const ext = testFramework === 'pytest' ? '.py' : testFramework === 'junit' ? '.java' : '.test.ts'
+    a.download = `${activeTab}${ext}`
     a.click()
     addToast('Test file downloaded!', 'success')
   }

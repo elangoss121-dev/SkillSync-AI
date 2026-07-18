@@ -8,9 +8,19 @@ import ConfidenceMeter from '../../components/ui/ConfidenceMeter'
 import AITypingEffect from '../../components/ui/AITypingEffect'
 import { ThinkingLoader } from '../../components/ui/AISkeleton'
 import { useApp } from '../../context/AppContext'
-import { MOCK_SAMPLE_ERROR_TEXT } from '../../data/mockData'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
+
+// Map language IDs to Prism-compatible language strings
+const LANG_TO_PRISM = {
+  javascript: 'javascript',
+  typescript: 'typescript',
+  python: 'python',
+  java: 'java',
+  go: 'go',
+  rust: 'rust',
+  cpp: 'cpp',
+}
 
 const LANGUAGES = [
   { id: 'javascript', label: 'JS' },
@@ -22,17 +32,24 @@ const LANGUAGES = [
   { id: 'cpp', label: 'C++' },
 ]
 
+const DEMO_CODE = `def calculate_total(items):
+    total = 0
+    for item in items:
+        if item['active'] == True:
+            total = total + (item['price'] * item['quantity'])
+    return total`
+
 function CopyButton({ text }) {
   const { addToast } = useApp()
   const [copied, setCopied] = useState(false)
   const handleCopy = () => {
-    navigator.clipboard.writeText(text)
+    navigator.clipboard.writeText(text || '')
     setCopied(true)
     addToast('Copied to clipboard', 'success')
     setTimeout(() => setCopied(false), 2000)
   }
   return (
-    <button onClick={handleCopy} className="btn-ghost text-xs font-mono">
+    <button onClick={handleCopy} className="btn-ghost text-xs font-mono flex items-center gap-1.5">
       <Copy className="w-3.5 h-3.5" />
       {copied ? 'Copied!' : 'Copy'}
     </button>
@@ -48,22 +65,17 @@ export default function ConvertCode() {
   const { run, loading, result, reset } = useAI('explainError')
 
   const handleSubmit = async () => {
+    // We pass language context in the text itself so the backend understands
+    const contextualText = text
+      ? `Convert the following ${fromLang} code to ${toLang}:\n\n${text}`
+      : `Convert the following ${fromLang} code to ${toLang}:\n\n${DEMO_CODE}`
+
     const payload = {
-      text: text || (file ? '' : MOCK_SAMPLE_ERROR_TEXT),
+      text: contextualText,
       language: fromLang,
-      target_language: toLang,
       image: file || undefined,
     }
     await run(payload)
-  }
-
-  const handleDemo = () => {
-    setText(`def calculate_total(items):
-    total = 0
-    for item in items:
-        if item['active'] == True:
-            total = total + (item['price'] * item['quantity'])
-    return total`)
   }
 
   const d = result?.data
@@ -101,7 +113,7 @@ export default function ConvertCode() {
               ))}
             </div>
           </div>
-          <ArrowLeftRight className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+          <ArrowLeftRight className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--accent-primary)' }} />
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">To</span>
             <div className="flex items-center gap-0.5 border p-0.5 rounded" style={{ backgroundColor: 'var(--bg-elevated)', borderColor: 'var(--border)' }}>
@@ -147,7 +159,7 @@ export default function ConvertCode() {
             <div className="flex items-center justify-between px-6 py-3 border-b bg-zinc-50/50 dark:bg-zinc-900/50" style={{ borderColor: 'var(--border)' }}>
               <span className="text-[10px] font-bold text-zinc-500 uppercase font-mono tracking-wider">Source Code</span>
               <button
-                onClick={handleDemo}
+                onClick={() => setText(DEMO_CODE)}
                 className="text-[10px] font-bold bg-transparent border-0 outline-none hover:underline font-mono"
                 style={{ color: 'var(--accent-primary)' }}
               >
@@ -195,11 +207,11 @@ export default function ConvertCode() {
             exit={{ opacity: 0, y: 10 }}
             className="space-y-6"
           >
-            {/* Toolbar status header */}
+            {/* Header */}
             <div className="workspace-card p-4 flex items-center justify-between" style={{ borderColor: 'var(--border-solid)' }}>
               <div className="flex items-center gap-3 flex-wrap font-mono">
                 <SeverityBadge severity={d.severity} />
-                <span className="text-[10px] text-zinc-500">{d.error_type}</span>
+                <span className="text-[10px] text-zinc-500">{fromLang} → {toLang}</span>
                 {result?.model && (
                   <span className="px-2.5 py-0.5 rounded text-[9px] border" style={{ color: 'var(--accent-primary)', backgroundColor: 'var(--accent-primary-glow)', borderColor: 'var(--accent-primary-glow)' }}>
                     {result.model}
@@ -225,7 +237,7 @@ export default function ConvertCode() {
               </p>
             </div>
 
-            {/* Plain English summary */}
+            {/* Key differences */}
             <div className="workspace-card" style={{ borderColor: 'var(--border-solid)' }}>
               <div className="flex items-center gap-2 mb-3 select-none">
                 <Lightbulb className="w-4 h-4 text-amber-500" />
@@ -234,7 +246,7 @@ export default function ConvertCode() {
               <p className="body-text italic text-zinc-800 dark:text-zinc-350">"{d.beginner_explanation}"</p>
             </div>
 
-            {/* Conversion steps */}
+            {/* Migration notes */}
             <div className="workspace-card" style={{ borderColor: 'var(--border-solid)' }}>
               <div className="flex items-center gap-2 mb-4 select-none">
                 <Wrench className="w-4 h-4 text-emerald-500" />
@@ -255,12 +267,14 @@ export default function ConvertCode() {
             {/* Converted Code */}
             <div className="workspace-card p-0 overflow-hidden" style={{ borderColor: 'var(--border-solid)' }}>
               <div className="flex items-center justify-between px-6 py-3 border-b" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-elevated)' }}>
-                <span className="text-[10px] font-bold text-zinc-500 uppercase font-mono tracking-wider">Converted Output</span>
+                <span className="text-[10px] font-bold text-zinc-500 uppercase font-mono tracking-wider">
+                  Converted Output ({toLang})
+                </span>
                 <CopyButton text={d.corrected_code} />
               </div>
               <div className="bg-[#0C0C0C] dark:bg-[#0C0C0C]">
                 <SyntaxHighlighter
-                  language={toLang}
+                  language={LANG_TO_PRISM[toLang] || 'javascript'}
                   style={vscDarkPlus}
                   customStyle={{ background: 'transparent', margin: 0, padding: '1.25rem', fontSize: '0.72rem' }}
                 >
