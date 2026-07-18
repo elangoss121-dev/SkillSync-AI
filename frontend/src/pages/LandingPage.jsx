@@ -2,60 +2,77 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import {
-  Terminal as TerminalIcon, FileText, Code2, Layout, ArrowRight,
+  Bug, ArrowLeftRight, FlaskConical, Zap, ArrowRight,
   Sparkles, Play, Cpu, Server, Activity
 } from 'lucide-react'
 
 // 4 Simulator States for the Interactive Terminal Preview
 const SIMULATIONS = [
   {
-    id: 'error',
-    label: 'Error Explainer',
-    icon: TerminalIcon,
-    filename: 'ProductList.jsx — Diagnostic Core',
-    inputTitle: 'terminal.log',
-    inputCode: `TypeError: Cannot read properties of undefined (reading 'map')
-  at ProductList (ProductList.jsx:12:24)
-  at renderWithHooks (react-dom.js:154)
-  at mountIndeterminateComponent (react-dom.js:182)`,
-    outputTitle: 'skillsync-diagnostics.json',
+    id: 'debug',
+    label: 'Debug Code',
+    icon: Bug,
+    filename: 'ProductList.jsx — Debug Engine',
+    inputTitle: 'buggy_code.js',
+    inputCode: `function fetchUser(id) {
+  const user = users[id]  // ReferenceError: users is not defined
+  return user.profile.name
+}`,
+    outputTitle: 'debug-report.json',
     outputCode: `{
-  "error": "TypeError: Cannot read map of undefined",
-  "root_cause": "Called .map() on 'data.items' which is undefined on initial mount.",
-  "confidence": "96%",
-  "proposed_fix": "const items = (data?.items ?? []).map(i => i.name);"
+  "issues": [
+    { "line": 2, "type": "ReferenceError", "fix": "Pass users as a parameter" },
+    { "line": 3, "type": "NullPointerRisk", "fix": "Optional chain: user?.profile?.name" }
+  ],
+  "confidence": "97%"
 }`
   },
   {
-    id: 'docs',
-    label: 'Docs Generator',
-    icon: FileText,
-    filename: 'docs_service.py — Documentation',
-    inputTitle: 'github-repo-payload',
-    inputCode: `// download_github_repo(owner="skillsync-ai", repo="core")
-// ZIP parsed successfully. 14 source files found.
-// Generating README.md...`,
-    outputTitle: 'README.md',
-    outputCode: `# SkillSync AI Core Service
-
-FastAPI service handling Gemini OCR models and file parsers.
-
-## API Setup
-\`\`\`bash
-pip install -r requirements.txt
-uvicorn main:app --reload
-\`\`\`
-
-## Key Modules
-- \`ai_providers/\`: Core LLM orchestration
-- \`services/\`: Analysis service layers`
+    id: 'convert',
+    label: 'Convert Code',
+    icon: ArrowLeftRight,
+    filename: 'converter.py → TypeScript',
+    inputTitle: 'source.py',
+    inputCode: `def calculate_total(items):
+    return sum(item['price'] * item['qty']
+               for item in items
+               if item.get('active'))`,
+    outputTitle: 'output.ts',
+    outputCode: `function calculateTotal(items: Item[]): number {
+  return items
+    .filter(item => item.active)
+    .reduce((sum, item) => sum + item.price * item.qty, 0)
+}`
   },
   {
-    id: 'simplify',
-    label: 'Code Simplifier',
-    icon: Code2,
-    filename: 'utils.js — Refactor Engine',
-    inputTitle: 'complex_function.js',
+    id: 'tests',
+    label: 'Generate Unit Tests',
+    icon: FlaskConical,
+    filename: 'authService.ts — Test Generator',
+    inputTitle: 'auth_service.ts',
+    inputCode: `export function validateToken(token: string): boolean {
+  if (!token || token.length < 16) return false
+  return token.startsWith('sk_') && /^[a-z0-9_]+$/.test(token)
+}`,
+    outputTitle: 'auth_service.test.ts',
+    outputCode: `describe('validateToken', () => {
+  it('returns false for empty string', () => {
+    expect(validateToken('')).toBe(false)
+  })
+  it('returns false for short token', () => {
+    expect(validateToken('sk_abc')).toBe(false)
+  })
+  it('returns true for valid token', () => {
+    expect(validateToken('sk_abc123valid0x')).toBe(true)
+  })
+})`
+  },
+  {
+    id: 'optimize',
+    label: 'Optimize Code',
+    icon: Zap,
+    filename: 'utils.js — Optimizer',
+    inputTitle: 'slow_function.js',
     inputCode: `function checkUsers(users) {
   let active = [];
   for (let i = 0; i < users.length; i++) {
@@ -67,39 +84,17 @@ uvicorn main:app --reload
   }
   return active;
 }`,
-    outputTitle: 'simplified_function.js',
+    outputTitle: 'optimized_function.js',
     outputCode: `// Complexity score reduced from 8 to 2
 function checkUsers(users) {
   return users.filter(u => u.active && u.role === "admin");
-}`
-  },
-  {
-    id: 'ui-to-code',
-    label: 'UI to Code',
-    icon: Layout,
-    filename: 'mockup_uploader.png — UI Compiler',
-    inputTitle: 'wireframe-mockup.png',
-    inputCode: `[Image Payload: 1200x800px]
-- Detected layout: Sidebar Navigation + Main Editor grid
-- Color theme: Dark mode (#0A0A0A background)
-- Extracting components...`,
-    outputTitle: 'DashboardPreview.jsx',
-    outputCode: `export default function Dashboard() {
-  return (
-    <div className="flex h-screen bg-[#0A0A0A] text-white">
-      <Sidebar className="w-64 border-r border-zinc-800" />
-      <main className="flex-1 p-6 bg-grid">
-        <h1 className="text-xl font-bold">Workspace</h1>
-      </main>
-    </div>
-  )
 }`
   }
 ]
 
 export default function LandingPage() {
   const navigate = useNavigate()
-  const [activeSimId, setActiveSimId] = useState('error')
+  const [activeSimId, setActiveSimId] = useState('debug')
   const activeSim = SIMULATIONS.find(s => s.id === activeSimId)
 
   // Auto-switch simulator tabs every 6 seconds
@@ -192,14 +187,14 @@ export default function LandingPage() {
             className="flex flex-wrap items-center justify-center gap-4 mb-16 select-none"
           >
             <button
-              onClick={() => navigate('/dashboard/error-explainer')}
+              onClick={() => navigate('/dashboard/debug-code')}
               className="btn-primary cursor-pointer"
             >
               Open Developer OS
               <ArrowRight className="w-4 h-4" />
             </button>
             <button
-              onClick={() => navigate('/dashboard/error-explainer')}
+              onClick={() => navigate('/dashboard/debug-code')}
               className="btn-secondary cursor-pointer"
             >
               <Play className="w-3.5 h-3.5" style={{ color: 'var(--accent-primary)' }} />
@@ -319,7 +314,7 @@ export default function LandingPage() {
               return (
                 <div 
                   key={s.id}
-                  onClick={() => navigate('/dashboard/error-explainer')}
+                  onClick={() => navigate(`/dashboard/${s.id === 'debug' ? 'debug-code' : s.id === 'convert' ? 'convert-code' : s.id === 'tests' ? 'generate-tests' : 'optimize-code'}`)}
                   className="border rounded-md p-6 transition-all cursor-pointer group hover:border-[color:var(--accent-primary)] shadow-sm hover:shadow-md"
                   style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-surface)' }}
                 >
@@ -331,10 +326,10 @@ export default function LandingPage() {
                     <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                   </h3>
                   <p className="text-xs leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
-                    {s.id === 'error' && 'Inject raw trace logs or visual screen snips to parse exact memory addresses and resolve code faults instantly.'}
-                    {s.id === 'docs' && 'Scan files, directories, or repository streams. Produce unified README setups and code catalogs automatically.'}
-                    {s.id === 'simplify' && 'Format, flatten, and restructure deeply nested logical checks or loops. Extract redundancies cleanly.'}
-                    {s.id === 'ui-to-code' && 'Transform visual sketches and screenshots into production ready React web modules.'}
+                    {s.id === 'debug'   && 'Analyze buggy code, identify root causes, and get precise fix suggestions with confidence scores instantly.'}
+                    {s.id === 'convert' && 'Translate code between any programming languages — Python, TypeScript, Go, Rust, Java, and more — preserving logic and idioms.'}
+                    {s.id === 'tests'   && 'Auto-generate comprehensive unit test suites from your source code covering edge cases and error conditions.'}
+                    {s.id === 'optimize' && 'Reduce cognitive complexity, eliminate redundancies, and restructure deeply nested logic for peak performance.'}
                   </p>
                   <div className="flex gap-2">
                     <span className="px-2 py-0.5 rounded text-[10px] font-mono border" style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-muted)', borderColor: 'var(--border)' }}>

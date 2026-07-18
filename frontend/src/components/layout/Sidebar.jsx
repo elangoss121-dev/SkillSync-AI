@@ -1,17 +1,17 @@
 import { NavLink } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Bug, FileText, Code2, Image,
+  Bug, ArrowLeftRight, FlaskConical, Zap,
   Cpu, ChevronLeft, ChevronRight, LogOut, User, X, Settings
 } from 'lucide-react'
 import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
 
 const NAV_ITEMS = [
-  { to: '/dashboard/ui-to-code',      icon: Image,    label: 'UI to Code' },
-  { to: '/dashboard/error-explainer', icon: Bug,      label: 'Error Explainer' },
-  { to: '/dashboard/docs-generator',  icon: FileText, label: 'Docs Generator' },
-  { to: '/dashboard/code-simplifier', icon: Code2,    label: 'Code Simplifier' },
+  { to: '/dashboard/debug-code',      icon: Bug,            label: 'Debug Code' },
+  { to: '/dashboard/convert-code',    icon: ArrowLeftRight, label: 'Convert Code' },
+  { to: '/dashboard/generate-tests',  icon: FlaskConical,   label: 'Generate Unit Tests' },
+  { to: '/dashboard/optimize-code',   icon: Zap,            label: 'Optimize Code' },
 ]
 
 export default function Sidebar({ mobileOpen, setMobileOpen }) {
