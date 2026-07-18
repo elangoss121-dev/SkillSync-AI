@@ -49,7 +49,7 @@ export default function LoginPage() {
       localStorage.setItem('skillsync_token', data.token)
       localStorage.setItem('skillsync_user', JSON.stringify(data.user))
       setSuccess(`Welcome, ${data.user.name}! Redirecting…`)
-      setTimeout(() => navigate('/dashboard/error-explainer'), 1200)
+      setTimeout(() => navigate('/dashboard/debug-code'), 1200)
     } catch (err) {
       const msg = err?.response?.data?.detail || 'Google login failed. Please try again.'
       setError(msg)
@@ -62,7 +62,7 @@ export default function LoginPage() {
     /* global google */
     if (typeof google !== 'undefined') {
       google.accounts.id.initialize({
-        client_id: "206983008751-b0t50s6fedqijv24ig51jds4k64j708d.apps.googleusercontent.com",
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
         callback: handleGoogleLogin,
       })
       google.accounts.id.renderButton(
@@ -78,10 +78,9 @@ export default function LoginPage() {
     }
   }, [tab, theme, isDark, handleGoogleLogin])
 
-  // Check if already logged in
   useEffect(() => {
     const token = localStorage.getItem('skillsync_token')
-    if (token) navigate('/dashboard/error-explainer', { replace: true })
+    if (token) navigate('/dashboard/debug-code', { replace: true })
   }, [navigate])
 
   const switchTab = (t) => {
@@ -107,7 +106,7 @@ export default function LoginPage() {
         localStorage.setItem('skillsync_token', data.token)
         localStorage.setItem('skillsync_user', JSON.stringify(data.user))
         setSuccess(`Welcome, ${data.user.name}! Redirecting…`)
-        setTimeout(() => navigate('/dashboard/error-explainer'), 1200)
+        setTimeout(() => navigate('/dashboard/debug-code'), 1200)
       } else {
         const { data } = await axios.post(`${API_BASE}/api/auth/login`, {
           email, password,
@@ -115,7 +114,7 @@ export default function LoginPage() {
         localStorage.setItem('skillsync_token', data.token)
         localStorage.setItem('skillsync_user', JSON.stringify(data.user))
         setSuccess(`Welcome back, ${data.user.name}! Redirecting…`)
-        setTimeout(() => navigate('/dashboard/error-explainer'), 1200)
+        setTimeout(() => navigate('/dashboard/debug-code'), 1200)
       }
     } catch (err) {
       const msg = err?.response?.data?.detail || 'Something went wrong. Please try again.'

@@ -15,7 +15,7 @@ from typing import Optional
 
 load_dotenv()
 
-from routes import error_explainer, docs_generator, code_simplifier, ui_to_code, auth
+from routes import error_explainer, docs_generator, code_simplifier, ui_to_code, explain_code, auth
 from utils.database import init_db
 
 
@@ -49,6 +49,7 @@ app.include_router(error_explainer.router, prefix="/api", tags=["Error Explainer
 app.include_router(docs_generator.router, prefix="/api", tags=["Docs Generator"])
 app.include_router(code_simplifier.router, prefix="/api", tags=["Code Simplifier"])
 app.include_router(ui_to_code.router, prefix="/api", tags=["UI to Code"])
+app.include_router(explain_code.router, prefix="/api", tags=["Explain Code"])
 app.include_router(auth.router)
 
 

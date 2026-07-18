@@ -14,32 +14,39 @@ export default function CommandPalette({ isOpen, setIsOpen }) {
   // Options array
   const options = [
     {
-      id: 'error-explainer',
-      name: 'Explain Error / Logs',
+      id: 'debug-code',
+      name: 'Debug Code',
       icon: Terminal,
       category: 'Workspace Tools',
-      action: () => navigate('/dashboard/error-explainer')
+      action: () => navigate('/dashboard/debug-code')
     },
     {
-      id: 'docs-generator',
-      name: 'Generate Documentation',
-      icon: FileText,
-      category: 'Workspace Tools',
-      action: () => navigate('/dashboard/docs-generator')
-    },
-    {
-      id: 'code-simplifier',
-      name: 'Simplify Code Snippet',
+      id: 'convert-code',
+      name: 'Convert Code',
       icon: Code,
       category: 'Workspace Tools',
-      action: () => navigate('/dashboard/code-simplifier')
+      action: () => navigate('/dashboard/convert-code')
     },
     {
-      id: 'ui-to-code',
-      name: 'UI-to-Code Converter',
-      icon: Palette,
+      id: 'generate-tests',
+      name: 'Generate Unit Tests',
+      icon: FileText,
       category: 'Workspace Tools',
-      action: () => navigate('/dashboard/ui-to-code')
+      action: () => navigate('/dashboard/generate-tests')
+    },
+    {
+      id: 'optimize-code',
+      name: 'Optimize Code',
+      icon: Code,
+      category: 'Workspace Tools',
+      action: () => navigate('/dashboard/optimize-code')
+    },
+    {
+      id: 'explain-code',
+      name: 'Explain Code',
+      icon: FileText,
+      category: 'Workspace Tools',
+      action: () => navigate('/dashboard/explain-code')
     },
     {
       id: 'toggle-theme',

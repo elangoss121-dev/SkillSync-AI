@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Bug, ArrowLeftRight, FlaskConical, Zap,
+  Bug, ArrowLeftRight, FlaskConical, Zap, FileText,
   Cpu, ChevronLeft, ChevronRight, LogOut, User, X, Settings
 } from 'lucide-react'
 import { useState } from 'react'
@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { to: '/dashboard/convert-code',    icon: ArrowLeftRight, label: 'Convert Code' },
   { to: '/dashboard/generate-tests',  icon: FlaskConical,   label: 'Generate Unit Tests' },
   { to: '/dashboard/optimize-code',   icon: Zap,            label: 'Optimize Code' },
+  { to: '/dashboard/explain-code',    icon: FileText,       label: 'Explain Code' },
 ]
 
 export default function Sidebar({ mobileOpen, setMobileOpen }) {

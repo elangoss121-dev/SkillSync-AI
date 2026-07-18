@@ -8,6 +8,7 @@ import DebugCode from './pages/dashboard/DebugCode'
 import ConvertCode from './pages/dashboard/ConvertCode'
 import GenerateTests from './pages/dashboard/GenerateTests'
 import OptimizeCode from './pages/dashboard/OptimizeCode'
+import ExplainCode from './pages/dashboard/ExplainCode'
 
 // ── Auth guard: redirect to /login if no token stored ──────────────────────────
 function RequireAuth({ children }) {
@@ -35,6 +36,7 @@ export default function App() {
             <Route path="convert-code"    element={<ConvertCode />} />
             <Route path="generate-tests"  element={<GenerateTests />} />
             <Route path="optimize-code"   element={<OptimizeCode />} />
+            <Route path="explain-code"    element={<ExplainCode />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

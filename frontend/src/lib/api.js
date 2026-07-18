@@ -53,6 +53,11 @@ export const api = {
       headers: { 'Content-Type': 'multipart/form-data', ...headers },
     }),
 
+  explainCode: (payload, headers = {}) =>
+    createClient().post('/api/explain-code', toForm(payload), {
+      headers: { 'Content-Type': 'multipart/form-data', ...headers },
+    }),
+
   health: () => createClient().get('/api/health'),
 }
 

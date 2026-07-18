@@ -329,4 +329,27 @@ def fibonacci(n):
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)`
 
-export const MOCK_SAMPLE_GITHUB_URL = 'https://github.com/your-org/devmate-ai'
+export const MOCK_SAMPLE_GITHUB_URL = 'https://github.com/facebook/react'
+
+export const MOCK_QUICK_CHAT_RESPONSE = {
+  response: "I'm a mock AI assistant. Since you're in Demo Mode, I am responding with a canned message. Connect a real API key in `.env` to use the live cognitive engine."
+}
+
+export const MOCK_EXPLAIN_CODE_RESPONSE = {
+  success: true,
+  confidence: 0.92,
+  demo_mode: true,
+  model: 'gemini-1.5-flash (demo)',
+  data: {
+    summary: "This code implements a memoization decorator to cache function results and improve performance.",
+    complexity_label: "Intermediate",
+    step_by_step: [
+      { step: 1, description: "A higher-order function `memoize` is defined.", code_snippet: "def memoize(fn):" },
+      { step: 2, description: "A cache dictionary is initialized to store results.", code_snippet: "cache = {}" },
+      { step: 3, description: "If the arguments are not in the cache, the function is executed and saved.", code_snippet: "if args not in cache:\n    cache[args] = fn(*args)" },
+      { step: 4, description: "The cached result is returned.", code_snippet: "return cache[args]" }
+    ],
+    key_concepts: ["Decorators", "Memoization", "Closures", "Higher-Order Functions"],
+    real_world_analogy: "It's like a math student remembering the answer to a hard calculation so they don't have to compute it from scratch the next time the teacher asks the exact same question."
+  }
+}

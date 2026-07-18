@@ -2,10 +2,12 @@ import httpx
 import os
 from typing import Optional, Tuple
 
+# Valid Groq models — see https://console.groq.com/docs/models
 GROQ_MODELS = [
-    "openai/gpt-oss-120b",
     "llama-3.3-70b-versatile",
+    "llama-3.1-70b-versatile",
     "llama-3.1-8b-instant",
+    "gemma2-9b-it",
 ]
 
 
@@ -38,6 +40,8 @@ async def generate(prompt: str, api_key: Optional[str] = None) -> Tuple[str, str
                     json={
                         "model": model,
                         "messages": [{"role": "user", "content": prompt}],
+                        "temperature": 0.3,
+                        "max_tokens": 8192,
                     },
                     timeout=35.0,
                 )
@@ -45,21 +49,18 @@ async def generate(prompt: str, api_key: Optional[str] = None) -> Tuple[str, str
                 if response.status_code == 200:
                     result = response.json()
                     content = result["choices"][0]["message"]["content"]
-                    return content, model
+                    return content, f"groq/{model}"
 
                 err_body = response.text
                 if response.status_code == 401:
-                    # Authentication failure, stop immediately
                     raise ValueError(f"Groq Authentication Failed (401): {err_body}")
 
                 raise Exception(f"Groq API error ({response.status_code}) on model {model}: {err_body}")
 
             except Exception as e:
-                # If it's authentication error, re-raise immediately
                 if "Authentication Failed" in str(e):
                     raise
                 last_error = e
-                # Fall back to next model on other errors
                 continue
 
     raise last_error or Exception("All Groq models failed")

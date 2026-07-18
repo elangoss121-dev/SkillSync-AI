@@ -17,7 +17,11 @@ from utils.database import create_user, get_user_by_email, get_user_by_id, verif
 router = APIRouter(prefix="/api/auth", tags=["Auth"])
 
 # ── JWT config ─────────────────────────────────────────────────────────────────
-SECRET_KEY  = os.getenv("JWT_SECRET", "skillsync-super-secret-key-change-in-prod")
+SECRET_KEY  = os.getenv("JWT_SECRET")
+if not SECRET_KEY:
+    import warnings
+    warnings.warn("JWT_SECRET is not set — using insecure default. Set it in your .env file.", stacklevel=1)
+    SECRET_KEY = "skillsync-super-secret-key-change-in-prod"
 ALGORITHM   = "HS256"
 EXPIRE_DAYS = 30
 
@@ -145,8 +149,9 @@ async def google_login(body: GoogleLoginRequest):
 
         payload = res.json()
         
+        expected_aud = os.getenv("GOOGLE_CLIENT_ID", "")
         aud = payload.get("aud")
-        if aud != "206983008751-b0t50s6fedqijv24ig51jds4k64j708d.apps.googleusercontent.com":
+        if expected_aud and aud != expected_aud:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Token audience mismatch"

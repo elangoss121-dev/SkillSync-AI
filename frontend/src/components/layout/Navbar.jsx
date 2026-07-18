@@ -3,10 +3,11 @@ import { useApp } from '../../context/AppContext'
 import { Folder, ChevronRight, User, Menu, BarChart2, Search } from 'lucide-react'
 
 const BREADCRUMBS = {
-  '/dashboard/error-explainer': ['src', 'pages', 'ErrorExplainer.jsx'],
-  '/dashboard/docs-generator': ['src', 'pages', 'DocsGenerator.jsx'],
-  '/dashboard/code-simplifier': ['src', 'pages', 'CodeSimplifier.jsx'],
-  '/dashboard/ui-to-code': ['src', 'pages', 'UIToCode.jsx'],
+  '/dashboard/debug-code': ['src', 'pages', 'DebugCode.jsx'],
+  '/dashboard/convert-code': ['src', 'pages', 'ConvertCode.jsx'],
+  '/dashboard/generate-tests': ['src', 'pages', 'GenerateTests.jsx'],
+  '/dashboard/optimize-code': ['src', 'pages', 'OptimizeCode.jsx'],
+  '/dashboard/explain-code': ['src', 'pages', 'ExplainCode.jsx'],
 }
 
 export default function Navbar({ onMenuClick, onInsightsToggle, onSearchClick }) {

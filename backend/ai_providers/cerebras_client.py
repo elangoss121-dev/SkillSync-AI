@@ -2,10 +2,11 @@ import httpx
 import os
 from typing import Optional, Tuple
 
-# Validated models from /v1/models endpoint — tried in priority order
+# Valid Cerebras models — see https://cloud.cerebras.ai
 CEREBRAS_MODELS = [
-    "gpt-oss-120b",
-    "zai-glm-4.7",
+    "llama-3.3-70b",
+    "llama-3.1-70b",
+    "llama-3.1-8b",
 ]
 
 
@@ -38,7 +39,7 @@ async def generate(prompt: str, api_key: Optional[str] = None) -> Tuple[str, str
                     json={
                         "model": model,
                         "messages": [{"role": "user", "content": prompt}],
-                        "temperature": 0.7,
+                        "temperature": 0.3,
                         "max_completion_tokens": 8192,
                     },
                     timeout=40.0,
@@ -51,22 +52,17 @@ async def generate(prompt: str, api_key: Optional[str] = None) -> Tuple[str, str
 
                 err_body = response.text
                 if response.status_code == 401:
-                    # Authentication failure — stop immediately, do not retry
                     raise ValueError(f"Cerebras Authentication Failed (401): {err_body}")
 
                 if response.status_code == 429:
-                    # Rate limit — fall back to next model
                     raise Exception(f"Cerebras rate limit on model {model}: {err_body}")
 
                 raise Exception(f"Cerebras API error ({response.status_code}) on model {model}: {err_body}")
 
             except Exception as e:
-                err_str = str(e)
-                # If authentication error, re-raise immediately
-                if "Authentication Failed" in err_str:
+                if "Authentication Failed" in str(e):
                     raise
                 last_error = e
-                # Fall back to next model on other errors
                 continue
 
     raise last_error or Exception("All Cerebras models failed")

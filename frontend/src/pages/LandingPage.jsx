@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import {
   Bug, ArrowLeftRight, FlaskConical, Zap, ArrowRight,
-  Sparkles, Play, Cpu, Server, Activity
+  Sparkles, Play, Cpu, Server, Activity, FileText
 } from 'lucide-react'
 
 // 4 Simulator States for the Interactive Terminal Preview
@@ -88,6 +88,26 @@ const SIMULATIONS = [
     outputCode: `// Complexity score reduced from 8 to 2
 function checkUsers(users) {
   return users.filter(u => u.active && u.role === "admin");
+}`
+  },
+  {
+    id: 'explain',
+    label: 'Explain Code',
+    icon: FileText,
+    filename: 'script.py — Explainer',
+    inputTitle: 'complex_logic.py',
+    inputCode: `def memoize(fn):
+    cache = {}
+    def wrapper(*args):
+        if args not in cache:
+            cache[args] = fn(*args)
+        return cache[args]
+    return wrapper`,
+    outputTitle: 'explanation.json',
+    outputCode: `{
+  "summary": "This is a memoization decorator that caches function results.",
+  "complexity_label": "Intermediate",
+  "key_concepts": ["Decorators", "Closures"]
 }`
   }
 ]
@@ -314,7 +334,7 @@ export default function LandingPage() {
               return (
                 <div 
                   key={s.id}
-                  onClick={() => navigate(`/dashboard/${s.id === 'debug' ? 'debug-code' : s.id === 'convert' ? 'convert-code' : s.id === 'tests' ? 'generate-tests' : 'optimize-code'}`)}
+                  onClick={() => navigate(`/dashboard/${s.id === 'debug' ? 'debug-code' : s.id === 'convert' ? 'convert-code' : s.id === 'tests' ? 'generate-tests' : s.id === 'optimize' ? 'optimize-code' : 'explain-code'}`)}
                   className="border rounded-md p-6 transition-all cursor-pointer group hover:border-[color:var(--accent-primary)] shadow-sm hover:shadow-md"
                   style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-surface)' }}
                 >
@@ -330,6 +350,7 @@ export default function LandingPage() {
                     {s.id === 'convert' && 'Translate code between any programming languages — Python, TypeScript, Go, Rust, Java, and more — preserving logic and idioms.'}
                     {s.id === 'tests'   && 'Auto-generate comprehensive unit test suites from your source code covering edge cases and error conditions.'}
                     {s.id === 'optimize' && 'Reduce cognitive complexity, eliminate redundancies, and restructure deeply nested logic for peak performance.'}
+                    {s.id === 'explain' && 'Break down complex code line-by-line with plain English explanations and real-world analogies.'}
                   </p>
                   <div className="flex gap-2">
                     <span className="px-2 py-0.5 rounded text-[10px] font-mono border" style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-muted)', borderColor: 'var(--border)' }}>
