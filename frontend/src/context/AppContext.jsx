@@ -11,12 +11,14 @@ export function AppProvider({ children }) {
     } catch { return true }
   })
 
-  // ── current user (loaded from localStorage on mount) ──────────────────────
+  // ── current user (loaded from localStorage on mount, falling back to mock user) ──
   const [user, setUser] = useState(() => {
     try {
       const raw = localStorage.getItem('skillsync_user')
-      return raw ? JSON.parse(raw) : null
-    } catch { return null }
+      return raw ? JSON.parse(raw) : { name: "Developer", email: "developer@skillsync.ai" }
+    } catch { 
+      return { name: "Developer", email: "developer@skillsync.ai" } 
+    }
   })
 
   const login = useCallback((userData, token) => {
@@ -28,8 +30,8 @@ export function AppProvider({ children }) {
   const logout = useCallback(() => {
     localStorage.removeItem('skillsync_token')
     localStorage.removeItem('skillsync_user')
-    setUser(null)
-    window.location.href = '/login'
+    setUser({ name: "Developer", email: "developer@skillsync.ai" })
+    window.location.href = '/'
   }, [])
 
   // Theme: locked to 'dark'

@@ -154,11 +154,11 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/dashboard')}
               className="px-4 py-1.5 text-xs border rounded transition-colors font-semibold hover:bg-[color:var(--bg-hover)] cursor-pointer"
               style={{ borderColor: 'var(--border-solid)', backgroundColor: 'var(--bg-surface)', color: 'var(--text-secondary)' }}
             >
-              Sign In
+              Dashboard
             </button>
           </div>
         </div>

@@ -72,7 +72,7 @@ export default function CommandPalette({ isOpen, setIsOpen }) {
       category: 'Account',
       action: () => {
         logout()
-        navigate('/login')
+        navigate('/')
       }
     })
   }

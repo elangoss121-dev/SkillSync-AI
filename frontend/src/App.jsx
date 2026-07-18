@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AppProvider } from './context/AppContext'
 import Toast from './components/ui/Toast'
 import LandingPage from './pages/LandingPage'
-import LoginPage from './pages/LoginPage'
 import DashboardLayout from './components/layout/DashboardLayout'
 import DebugCode from './pages/dashboard/DebugCode'
 import ConvertCode from './pages/dashboard/ConvertCode'
@@ -11,26 +10,16 @@ import OptimizeCode from './pages/dashboard/OptimizeCode'
 import ExplainCode from './pages/dashboard/ExplainCode'
 import './lib/firebase' // Initialize Firebase and Analytics
 
-// ── Auth guard: redirect to /login if no token stored ──────────────────────────
-function RequireAuth({ children }) {
-  const token = localStorage.getItem('skillsync_token')
-  return token ? children : <Navigate to="/login" replace />
-}
-
 export default function App() {
   return (
     <AppProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/"      element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<Navigate to="/dashboard" replace />} />
           <Route
             path="/dashboard"
-            element={
-              <RequireAuth>
-                <DashboardLayout />
-              </RequireAuth>
-            }
+            element={<DashboardLayout />}
           >
             <Route index element={<Navigate to="debug-code" replace />} />
             <Route path="debug-code"      element={<DebugCode />} />
