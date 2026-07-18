@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AppProvider } from './context/AppContext'
 import Toast from './components/ui/Toast'
-import LandingPage from './pages/LandingPage'
 import DashboardLayout from './components/layout/DashboardLayout'
 import DebugCode from './pages/dashboard/DebugCode'
 import ConvertCode from './pages/dashboard/ConvertCode'
@@ -15,7 +14,7 @@ export default function App() {
     <AppProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/"      element={<LandingPage />} />
+          <Route path="/"      element={<Navigate to="/dashboard" replace />} />
           <Route path="/login" element={<Navigate to="/dashboard" replace />} />
           <Route
             path="/dashboard"
