@@ -3,7 +3,8 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import {
   Bug, ArrowLeftRight, FlaskConical, Zap, ArrowRight,
-  Sparkles, Play, Cpu, Server, Activity, FileText
+  Sparkles, Play, Cpu, Server, Activity, FileText,
+  Terminal as TerminalIcon
 } from 'lucide-react'
 
 // 4 Simulator States for the Interactive Terminal Preview

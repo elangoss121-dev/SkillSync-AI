@@ -4,7 +4,7 @@ from typing import Optional, Dict, Any
 
 from utils.json_cleaner import extract_json_from_text
 from ai_providers.prompt_templates import EXPLAIN_CODE_SYSTEM
-from ai_providers.gemini_client import generate_with_fallback
+from ai_providers.gemini_client import generate
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ Please explain the following code:
 ```
 """
 
-    response_text, model_used = await generate_with_fallback(
+    text_response, model_used = await generate(
         prompt=prompt,
         system_instruction=EXPLAIN_CODE_SYSTEM,
         api_key=api_key,

@@ -40,7 +40,17 @@ git clone https://github.com/your-username/skillsync-ai.git
 cd skillsync-ai
 ```
 
-### 2. Backend Setup
+### 2. Environment Setup
+
+All configuration variables are located in a single `.env` file at the root of the project.
+
+```bash
+# In the project root directory:
+cp .env.example .env
+# Edit .env and configure all variables (Firebase, API keys, JWT_SECRET, etc.)
+```
+
+### 3. Backend Setup
 
 ```bash
 cd backend
@@ -55,25 +65,17 @@ venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Setup environment variables
-cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY and other required keys
-
 # Run the server
 uvicorn main:app --reload --port 8000
 ```
 
-### 3. Frontend Setup
+### 4. Frontend Setup
 
 Open a new terminal window:
 
 ```bash
 cd frontend
 npm install
-
-# Setup environment variables
-cp .env.example .env.local
-# By default, VITE_API_URL=http://localhost:8000 is set
 
 # Start the dev server
 npm run dev

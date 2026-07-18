@@ -9,6 +9,7 @@ import ConvertCode from './pages/dashboard/ConvertCode'
 import GenerateTests from './pages/dashboard/GenerateTests'
 import OptimizeCode from './pages/dashboard/OptimizeCode'
 import ExplainCode from './pages/dashboard/ExplainCode'
+import './lib/firebase' // Initialize Firebase and Analytics
 
 // ── Auth guard: redirect to /login if no token stored ──────────────────────────
 function RequireAuth({ children }) {

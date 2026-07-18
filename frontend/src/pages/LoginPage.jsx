@@ -30,7 +30,9 @@ export default function LoginPage() {
   const [name, setName]             = useState('')
   const [email, setEmail]           = useState('')
   const [password, setPassword]     = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPass, setShowPass]     = useState(false)
+  const [showConfirmPass, setShowConfirmPass] = useState(false)
   const [loading, setLoading]       = useState(false)
   const [error, setError]           = useState('')
   const [success, setSuccess]       = useState('')
@@ -90,6 +92,7 @@ export default function LoginPage() {
     setName('')
     setEmail('')
     setPassword('')
+    setConfirmPassword('')
   }
 
   const handleSubmit = async (e) => {
@@ -100,6 +103,11 @@ export default function LoginPage() {
 
     try {
       if (tab === 'signup') {
+        if (password !== confirmPassword) {
+          setError('Passwords do not match.')
+          setLoading(false)
+          return
+        }
         const { data } = await axios.post(`${API_BASE}/api/auth/register`, {
           name, email, password,
         })
@@ -250,6 +258,41 @@ export default function LoginPage() {
                   {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+
+              {/* Confirm Password Field (Signup only) */}
+              <AnimatePresence mode="wait">
+                {tab === 'signup' && (
+                  <motion.div
+                    key="confirm-password-field"
+                    initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                    animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
+                    exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                    transition={{ duration: 0.2 }}
+                    style={{ overflow: 'hidden' }}
+                  >
+                    <label className="block text-[10px] font-bold mb-1.5 uppercase tracking-wider text-zinc-500">Confirm Password</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3.5 w-4 h-4 text-zinc-500" />
+                      <input
+                        required
+                        type={showConfirmPass ? 'text' : 'password'}
+                        className="w-full text-xs pl-10 pr-10 py-3 border rounded focus:outline-none transition-all font-mono"
+                        style={{ backgroundColor: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--text-primary)' }}
+                        placeholder="••••••••••••"
+                        value={confirmPassword}
+                        onChange={e => setConfirmPassword(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPass(!showConfirmPass)}
+                        className="absolute right-3 top-3.5 text-zinc-550 hover:text-zinc-300 transition-colors border-0 bg-transparent focus:outline-none cursor-pointer"
+                      >
+                        {showConfirmPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Password strength indicator */}
               <AnimatePresence>

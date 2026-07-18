@@ -131,13 +131,19 @@ Convert a UI screenshot into React + Tailwind code.
 - Python 3.11+
 - Gemini API key ([Get one here](https://aistudio.google.com))
 
+## Environment Setup
+
+Copy \`.env.example\` in the project root to \`.env\` and fill in the required API keys (e.g. \`GEMINI_API_KEY\`, Firebase Config, etc.):
+
+\`\`\`bash
+cp .env.example .env
+\`\`\`
+
 ## Frontend Setup
 
 \`\`\`bash
 cd frontend
 npm install
-cp .env.example .env.local
-# Add VITE_BACKEND_URL=http://localhost:8000
 npm run dev
 \`\`\`
 
@@ -148,8 +154,6 @@ cd backend
 python -m venv venv
 source venv/bin/activate  # Windows: venv\\Scripts\\activate
 pip install -r requirements.txt
-cp .env.example .env
-# Add your GEMINI_API_KEY
 uvicorn main:app --reload --port 8000
 \`\`\`
 

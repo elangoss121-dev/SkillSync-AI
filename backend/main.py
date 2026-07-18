@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from contextlib import asynccontextmanager
 from typing import Optional
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 from routes import error_explainer, docs_generator, code_simplifier, ui_to_code, explain_code, auth
 from utils.database import init_db

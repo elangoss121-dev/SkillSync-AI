@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // In production (Vercel) we use relative URLs so /api/* is served by
 // the same domain's serverless functions — no cross-origin issues.
-// In local dev, set VITE_API_URL=http://localhost:8000 in frontend/.env.local
+// In local dev, set VITE_API_URL=http://localhost:8000 in the root .env
 const getBaseUrl = () => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL
   // Relative URL: uses the current domain (works on Vercel automatically)

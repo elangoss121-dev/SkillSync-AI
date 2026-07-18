@@ -19,9 +19,7 @@ router = APIRouter(prefix="/api/auth", tags=["Auth"])
 # ── JWT config ─────────────────────────────────────────────────────────────────
 SECRET_KEY  = os.getenv("JWT_SECRET")
 if not SECRET_KEY:
-    import warnings
-    warnings.warn("JWT_SECRET is not set — using insecure default. Set it in your .env file.", stacklevel=1)
-    SECRET_KEY = "skillsync-super-secret-key-change-in-prod"
+    raise RuntimeError("JWT_SECRET environment variable is not set. Please set it in your .env file.")
 ALGORITHM   = "HS256"
 EXPIRE_DAYS = 30
 
